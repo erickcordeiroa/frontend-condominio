@@ -4,9 +4,9 @@ import Header from "./Header";
 
 const Layout: React.FC = () => {
   return (
-    <div>
+    <div className="flex flex-col h-screen">
       <Header />
-      <main><Outlet /></main>
+      <main ><Outlet /></main>
       <Footer />
     </div>
   );
