@@ -1,6 +1,8 @@
 import Layout from "@/components/Layout";
 import LayoutAdmin from "@/components/LayoutAdmin";
-import ListApartments from "@/pages/admin/ListAparts";
+import CreateProperty from "@/pages/admin/property/create-property";
+import EditProperty from "@/pages/admin/property/edit-property";
+import ListApartments from "@/pages/admin/property/list-property";
 import ForgotPassword from "@/pages/ForgotPassword";
 import Home from "@/pages/Home";
 import Login from "@/pages/Login";
@@ -21,7 +23,9 @@ const AppRoutes: React.FC = () => {
       </Route>
 
       <Route element={<LayoutAdmin />}>
-        <Route path="/admin/list-aparts" element={<ListApartments />} />
+        <Route path="/admin/property/list" element={<ListApartments />} />
+        <Route path="/admin/property/create" element={<CreateProperty />} />
+        <Route path="/admin/property/edit/:id" element={<EditProperty />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />
