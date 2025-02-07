@@ -1,4 +1,6 @@
 import Layout from "@/components/Layout";
+import LayoutAdmin from "@/components/LayoutAdmin";
+import ListApartments from "@/pages/admin/ListAparts";
 import ForgotPassword from "@/pages/ForgotPassword";
 import Home from "@/pages/Home";
 import Login from "@/pages/Login";
@@ -16,6 +18,10 @@ const AppRoutes: React.FC = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+      </Route>
+
+      <Route element={<LayoutAdmin />}>
+        <Route path="/admin/list-aparts" element={<ListApartments />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />
