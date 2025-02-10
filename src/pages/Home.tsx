@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,52 +27,40 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center space-y-8 p-4 sm:p-6 bg-gray-50 min-h-screen">
-      {/* Carrossel */}
-      <div className="w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden relative rounded-2xl">
-        <Carousel className="w-full h-full">
-          <CarouselContent>
-            {images.map((image, index) => (
-              <CarouselItem key={index} className="w-full h-full">
-                <img
-                  src={image}
-                  alt={`Slide ${index + 1}`}
-                  className="w-full h-full object-cover rounded-2xl"
-                />
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 p-2 rounded-full shadow-lg hover:bg-white transition backdrop-blur-sm border-none" />
-          <CarouselNext className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 p-2 rounded-full shadow-lg hover:bg-white transition backdrop-blur-sm border-none" />
-        </Carousel>
+    <div className="flex flex-col md:flex-row items-center justify-center min-h-screen w-screen p-6 bg-gradient-to-br from-gray-50 to-gray-100 gap-12">
+      {/* Swiper (Carrossel) */}
+      <div className="w-full md:w-2/3 h-[500px] rounded-3xl overflow-hidden shadow-2xl">
+        <Swiper
+          modules={[Navigation, Autoplay]}
+          navigation
+          autoplay={{ delay: 3000 }}
+          loop
+          className="rounded-3xl h-full"
+        >
+          {images.map((image, index) => (
+            <SwiperSlide key={index}>
+              <img src={image} alt={`Slide ${index + 1}`} className="w-full h-full object-cover rounded-3xl" />
+            </SwiperSlide>
+          ))}
+        </Swiper>
       </div>
 
       {/* Formulário de Cálculo */}
-      <div className="w-full max-w-md sm:max-w-lg md:max-w-2xl p-4 sm:p-6 md:p-8 bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl shadow-lg">
-        <h2 className="text-center text-xl sm:text-2xl font-semibold text-blue-900 mb-4 sm:mb-6">
-          Cálculo de Rateio
-        </h2>
-        <div className="space-y-4 sm:space-y-6">
-          {/* Radio Buttons para seleção do tipo */}
+      <div className="w-full md:w-1/3 h-[500px] bg-white p-8 rounded-3xl shadow-2xl flex flex-col justify-center">
+        <h2 className="text-center text-2xl font-bold text-gray-900 mb-6">Cálculo de Rateio</h2>
+        <div className="space-y-6">
+          {/* Tipo de Rateio */}
           <div>
-            <Label className="text-sm font-medium text-blue-800">Selecione o tipo:</Label>
-            <RadioGroup
-              defaultValue="loja"
-              className="mt-2"
-              onValueChange={(value) => setType(value)}
-            >
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="loja" id="loja" className="text-blue-600" />
-                  <Label htmlFor="loja" className="text-sm text-blue-800">
-                    Loja
-                  </Label>
+            <Label className="text-sm font-medium text-gray-700">Selecione o tipo:</Label>
+            <RadioGroup defaultValue="loja" className="mt-3" onValueChange={setType}>
+              <div className="flex items-center space-x-6">
+                <div className="flex items-center space-x-3">
+                  <RadioGroupItem value="loja" id="loja" />
+                  <Label htmlFor="loja" className="text-sm">Loja</Label>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="apartamento" id="apartamento" className="text-blue-600" />
-                  <Label htmlFor="apartamento" className="text-sm text-blue-800">
-                    Apartamento
-                  </Label>
+                <div className="flex items-center space-x-3">
+                  <RadioGroupItem value="apartamento" id="apartamento" />
+                  <Label htmlFor="apartamento" className="text-sm">Apartamento</Label>
                 </div>
               </div>
             </RadioGroup>
@@ -77,48 +68,23 @@ export default function Home() {
 
           {/* Número da Loja/Apartamento */}
           <div>
-            <Label htmlFor="number" className="text-sm font-medium text-blue-800">
-              Número da Loja/Apartamento:
-            </Label>
-            <Input
-              id="number"
-              type="number"
-              placeholder="Ex: 101"
-              value={number}
-              onChange={(e) => setNumber(e.target.value)}
-              className="mt-2 rounded-[5px] bg-white/80 border-blue-200 focus:border-blue-400"
-            />
+            <Label htmlFor="number" className="text-sm font-medium text-gray-700">Número:</Label>
+            <Input id="number" type="number" placeholder="Ex: 101" value={number} onChange={(e) => setNumber(e.target.value)} className="mt-2" />
           </div>
 
           {/* Valor do Rateio */}
           <div>
-            <Label htmlFor="rateio" className="text-sm font-medium text-blue-800">
-              Valor do Rateio (R$):
-            </Label>
-            <Input
-              id="rateio"
-              type="number"
-              placeholder="Ex: 150.00"
-              value={rateio}
-              onChange={(e) => setRateio(e.target.value)}
-              className="mt-2 rounded-[5px] bg-white/80 border-blue-200 focus:border-blue-400"
-            />
+            <Label htmlFor="rateio" className="text-sm font-medium text-gray-700">Valor do Rateio (R$):</Label>
+            <Input id="rateio" type="number" placeholder="Ex: 150.00" value={rateio} onChange={(e) => setRateio(e.target.value)} className="mt-2" />
           </div>
 
           {/* Botão de Calcular */}
-          <Button
-            onClick={calculate}
-            className="w-full rounded-[5px] bg-blue-600 hover:bg-blue-700 transition text-white py-2 shadow-md"
-          >
-            Calcular
-          </Button>
+          <Button onClick={calculate} className="w-full">Calcular</Button>
 
           {/* Resultado */}
           {result !== null && (
-            <div className="text-center mt-4">
-              <p className="text-lg font-bold text-blue-900">
-                Valor a pagar: R$ {result.toFixed(2)}
-              </p>
+            <div className="text-center mt-4 text-xl font-bold text-gray-900">
+              Valor a pagar: R$ {result.toFixed(2)}
             </div>
           )}
         </div>

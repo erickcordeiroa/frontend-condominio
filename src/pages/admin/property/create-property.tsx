@@ -1,15 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import ImageDrop from "@/components/ImageDrop";
+import { useOutletContext } from "react-router-dom";
 
 export default function CreateProperty() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [owner, setOwner] = useState("");
   const [images, setImages] = useState<File[]>([]);
+  const {setBreadcrumbItems} = useOutletContext<{ setBreadcrumbItems: (items: { label: string; href: string }[]) => void }>();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -22,6 +24,14 @@ export default function CreateProperty() {
     e.preventDefault();
     console.log({ title, description, owner, images });
   };
+
+  useEffect(() => {
+    setBreadcrumbItems([
+      { label: 'Admin', href: '/admin' },
+      { label: 'Propriedades', href: '/admin/property/list' },
+      { label: 'Criar', href: '/admin/property/create' },
+    ]);
+  }, [setBreadcrumbItems]);
 
   return (
     <div className="p-6">

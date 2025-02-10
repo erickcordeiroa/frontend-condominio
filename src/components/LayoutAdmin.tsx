@@ -1,68 +1,31 @@
 import { Outlet } from "react-router-dom";
-
 import { AppSidebar } from "@/components/ui/app-sidebar";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import BreadcrumbProvider from "@/context/BreadcrumbContext";
+import { useState } from "react";
 export default function LayoutAdmin() {
+
+  const [breadcrumbItems, setBreadcrumbItems] = useState([
+    { label: 'Admin', href: '#' },
+      { label: 'Propriedades', href: '/admin/property/list' },
+      { label: 'Listar', href: '/admin/property/list' },
+  ]);
 
   const data = {
     navMain: [
       {
-        title: "Getting Started",
-        url: "#",
-        items: [
-          {
-            title: "Installation",
-            url: "#",
-          },
-          {
-            title: "Project Structure",
-            url: "#",
-          },
-        ],
+        title: "Propriedades",
+        url: "/admin/property/list",
       },
       {
-        title: "Building Your Application",
+        title: "Usuários",
         url: "#",
-        items: [
-          {
-            title: "Routing",
-            url: "#",
-          },
-        ],
-      },
-      {
-        title: "API Reference",
-        url: "#",
-        items: [
-          {
-            title: "Components",
-            url: "#",
-          },
-        ],
-      },
-      {
-        title: "Architecture",
-        url: "#",
-        items: [
-          {
-            title: "Accessibility",
-            url: "#",
-          },
-        ],
-      },
+      }
     ],
   };
 
@@ -74,24 +37,15 @@ export default function LayoutAdmin() {
           <div className="flex items-center gap-2 px-3">
             <SidebarTrigger />
             <Separator orientation="vertical" className="mr-2 h-4" />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">
-                    Building Your Application
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+            <BreadcrumbProvider items={breadcrumbItems} />
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4">
-          <Outlet />
+          <Outlet context={{ setBreadcrumbItems }} />
         </div>
+        <footer className="px-6 py-4 text-center text-sm">
+      © {new Date().getFullYear()} Edifício Internacional. Todos os direitos reservados.
+    </footer>
       </SidebarInset>
     </SidebarProvider>
   );

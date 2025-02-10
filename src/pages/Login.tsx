@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 
 const Login: React.FC = () => {
   return (
-    <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-100 to-gray-100 px-4">
+    <div className="flex justify-center items-center h-screen bg-gradient-to-t from-gray-50 to-gray-100">
       <Card className="w-full max-w-sm sm:max-w-md md:max-w-lg bg-white shadow-xl rounded-lg p-6">
         <CardHeader className="flex flex-col items-center gap-3">
           <a href="/" className="flex items-center gap-2 mb-3">
@@ -49,7 +49,7 @@ const Login: React.FC = () => {
                 </Label>
                 <Link
                   to="/forgot-password"
-                  className="text-sm text-blue-600 hover:text-blue-800 transition"
+                  className="text-sm text-blue-900 hover:text-blue-700 transition"
                 >
                   Esqueceu sua senha?
                 </Link>
@@ -65,7 +65,7 @@ const Login: React.FC = () => {
             <div className="flex flex-col items-center mt-6">
               <Button
                 type="submit"
-                className="w-full rounded-[5px] bg-blue-600 hover:bg-blue-700 transition text-white py-2 shadow-md"
+                className="w-full"
               >
                 Entrar
               </Button>
@@ -75,7 +75,7 @@ const Login: React.FC = () => {
               <span>Não tem uma conta?</span>
               <Link
                 to="/register"
-                className="ml-1 text-blue-600 hover:text-blue-800 transition"
+                className="ml-1 text-blue-900 hover:text-blue-700 transition"
               >
                 Cadastre-se!
               </Link>

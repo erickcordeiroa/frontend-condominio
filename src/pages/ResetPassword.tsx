@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 
 const ResetPassword: React.FC = () => {
   return (
-    <div className="flex justify-center items-center h-screen bg-gradient-to-br from-blue-100 to-gray-100 px-4">
+    <div className="flex justify-center items-center h-screen bg-gradient-to-t from-gray-50 to-gray-100">
       <Card className="w-full max-w-sm sm:max-w-md md:max-w-lg bg-white shadow-xl rounded-lg p-6">
         <CardHeader className="flex flex-col items-center text-gray-600">
           <a href="/" className="flex items-center gap-2 mb-3">
@@ -33,7 +33,7 @@ const ResetPassword: React.FC = () => {
                 id="password"
                 type="password"
                 required
-                className="rounded-[5px] border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 hover:border-blue-400"
+                className="rounded-[5px] border border-gray-300 px-3 py-2 focus:ring-2"
               />
             </div>
             <div className="grid gap-2">
@@ -42,12 +42,12 @@ const ResetPassword: React.FC = () => {
                 id="confirmPassword"
                 type="password"
                 required
-                className="rounded-[5px] border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 hover:border-blue-400"
+                className="rounded-[5px] border border-gray-300 px-3 py-2 focus:ring-2"
               />
             </div>
             <Button
               type="submit"
-              className="w-full rounded-[5px] bg-blue-600 hover:bg-blue-700 transition text-white py-2 shadow-md"
+              className="mt-6"
             >
               Redefinir Senha
             </Button>

@@ -25,13 +25,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {showPassword ? (
           <Icon
             icon="streamline:visible-solid"
-            className="h-4 w-4 text-blue-500"
+            className="h-4 w-4 text-gray-500"
             onClick={togglePasswordVisibility}
           />
         ) : (
           <Icon
             icon="streamline:invisible-1-solid"
-            className="h-4 w-4 text-blue-500"
+            className="h-4 w-4 text-gray-500"
             onClick={togglePasswordVisibility}
           />
         )}
