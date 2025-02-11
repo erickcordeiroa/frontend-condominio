@@ -1,4 +1,7 @@
 import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import logo from "@/assets/images/LogoEdificioInternacional.png";
 import {
   Card,
@@ -11,10 +14,41 @@ import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 import { PasswordInput } from "@/components/ui/inputPassword";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
+import useSpinner from "@/hooks/useLoadingStore";
+import { toast } from "react-toastify";
+
+const schema = z.object({
+  email: z.string().email("E-mail inválido"),
+  password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
+});
 
 const Login: React.FC = () => {
+  const { loading, setLoading, Spinner } = useSpinner();
+  const {login} = useAuth()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<{ email: string; password: string }>({
+    resolver: zodResolver(schema),
+  });
+
+  const onSubmit = async (data: {email: string, password: string}) => {
+    console.log("Dados enviados:", data);
+    try {
+      setLoading(true);
+      await login(data.email, data.password);
+    } catch (error: any) {
+      toast.error("Erro ao fazer login. Verifique suas credenciais e tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex justify-center items-center h-screen bg-gradient-to-t from-gray-50 to-gray-100">
+      {loading ?? <Spinner></Spinner>}
       <Card className="w-full max-w-sm sm:max-w-md md:max-w-lg bg-white shadow-xl rounded-lg p-6">
         <CardHeader className="flex flex-col items-center gap-3">
           <a href="/" className="flex items-center gap-2 mb-3">
@@ -27,8 +61,9 @@ const Login: React.FC = () => {
             Informe seu e-mail e senha para continuar
           </CardDescription>
         </CardHeader>
+
         <CardContent>
-          <div className="grid gap-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="grid gap-5">
             <div className="grid gap-2">
               <Label htmlFor="email" className="text-sm text-gray-700">
                 E-mail:
@@ -37,9 +72,11 @@ const Login: React.FC = () => {
                 id="email"
                 type="email"
                 placeholder="exemplo@mail.com"
-                required
-                className="w-full rounded-[5px] border border-gray-300 px-3 py-2 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400"
+                {...register("email", { required: "Informe seu e-mail." })}
               />
+              {errors.email && (
+                <p className="text-red-500 text-sm">{errors.email.message as string}</p>
+              )}
             </div>
 
             <div className="grid gap-2">
@@ -57,17 +94,16 @@ const Login: React.FC = () => {
               <PasswordInput
                 id="password"
                 type="password"
-                required
-                className="w-full rounded-[5px] border border-gray-300 px-3 py-2 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-blue-400"
+                {...register("password", { required: "Informe sua senha." })}
               />
+              {errors.password && (
+                <p className="text-red-500 text-sm">{errors.password.message as string}</p>
+              )}
             </div>
 
             <div className="flex flex-col items-center mt-6">
-              <Button
-                type="submit"
-                className="w-full"
-              >
-                Entrar
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? "Entrando..." : "Entrar"}
               </Button>
             </div>
 
@@ -80,7 +116,7 @@ const Login: React.FC = () => {
                 Cadastre-se!
               </Link>
             </div>
-          </div>
+          </form>
         </CardContent>
       </Card>
     </div>

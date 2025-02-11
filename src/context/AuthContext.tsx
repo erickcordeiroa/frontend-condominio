@@ -1,17 +1,22 @@
 import { ReactNode, useContext, useState } from "react";
 import { createContext } from "react";
 import Cookies from "js-cookie";
+import { authLogin, isAuthenticated } from "@/service/authService";
+import { useNavigate } from "react-router-dom";
 
-type UserType = {
+
+type UserData = {
   id: number;
   name: string;
   email: string;
+  role: string;
 };
 
 type AuthContextType = {
-  user: UserType | null;
-  login: (userData: UserType) => void;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  userData: () => UserData | null;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -19,20 +24,37 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<UserType | null>(null);
+  const [auth, setAuth] = useState<boolean>(isAuthenticated());
+  const navigate = useNavigate();
 
-  const login = (userData: UserType) => {
-    setUser(userData);
-    Cookies.set("u-info", JSON.stringify(userData), { expires: 1 });
+  const login = async (email: string, password: string) => {
+    try {
+      await authLogin(email, password);
+
+      setAuth(true);
+      navigate("/admin/property/list");
+    } catch (error) {
+      throw error;
+    }
   };
 
   const logout = () => {
-    setUser(null);
+    setAuth(false);
     Cookies.remove("u-info");
+    Cookies.remove("u-token");
+    navigate("/login");
+  };
+
+  const userData = () => {
+    const userInfo = Cookies.get("u-info");
+    if (userInfo) {
+      return JSON.parse(userInfo);
+    }
+    return null;
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated: auth, userData, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
