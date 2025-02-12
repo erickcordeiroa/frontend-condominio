@@ -27,7 +27,7 @@ const AppRoutes: React.FC = () => {
       </Route>
 
       <Route path='' element={<LayoutAdmin />}>
-        <Route path="/admin/property/list" element={<ListApartments />} />
+        <Route path="/admin/properties" element={<ListApartments />} />
         <Route path="/admin/property/create" element={<CreateProperty />} />
         <Route path="/admin/property/edit/:id" element={<EditProperty />} />
       </Route>

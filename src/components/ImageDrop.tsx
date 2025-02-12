@@ -1,63 +1,98 @@
-import { useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { useController } from "react-hook-form";
 
-export default function ImageDrop() {
-  const [images, setImages] = useState<File[]>([]);
+const API_URL = import.meta.env.VITE_API_URL_BACKEND;
 
-  const onDrop = (acceptedFiles: File[]) => {
-    setImages((prev) => [...prev, ...acceptedFiles].slice(0, 5));
-  };
+interface ImageDropProps {
+  control: any;
+  name: string;
+  defaultImages?: any[];
+  onDeleteImage?: (id: string) => void;
+}
 
-  const { getRootProps, getInputProps } = useDropzone({
-    accept: { "image/*": [] },
-    multiple: true,
-    onDrop,
+const ImageDrop: React.FC<ImageDropProps> = ({ control, name, defaultImages = [], onDeleteImage }) => {
+  const { field } = useController({
+    control,
+    name,
+    defaultValue: defaultImages || [],
   });
 
-  const removeImage = (index: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
+
+  const images = Array.isArray(field.value)
+    ? field.value
+    : field.value?.value || [];
+
+    const { getRootProps, getInputProps } = useDropzone({
+      accept: {
+        "image/*": []
+      },
+      onDrop: (acceptedFiles) => {
+        const updatedFiles = [...images, ...acceptedFiles].slice(0, 5);
+        field.onChange(updatedFiles);
+      },
+    });
+
+  const handleRemoveImage = (index: number): void => {
+    const updatedFiles = images.filter((_: any, i: any) => i !== index);
+    field.onChange(updatedFiles);
+    if (onDeleteImage && images[index]?.id) {
+      onDeleteImage(images[index].id);
+    }
   };
 
   return (
-    <div className="space-y-4">
+    <div>
       <div
         {...getRootProps()}
-        className="border-2 border-dashed p-6 text-center cursor-pointer rounded-md mt-2"
+        style={{
+          border: "1px dashed gray",
+          padding: "20px",
+          textAlign: "center",
+          cursor: "pointer",
+        }}
       >
         <input {...getInputProps()} />
-        <p>Arraste e solte imagens aqui ou clique para selecionar (máx. 5)</p>
+        <p>Arraste e solte imagens aqui, ou clique para selecionar</p>
       </div>
+      <div style={{ display: "flex", flexWrap: "wrap", marginTop: "10px" }}>
+        {images.map((file: any, index: any) => {
 
-      <div className="flex flex-wrap gap-4">
-        {images.map((file, index) => {
-          const previewUrl = URL.createObjectURL(file);
+          const imageUrl =
+            file instanceof File
+              ? URL.createObjectURL(file) // Novo arquivo do dropzone
+              : API_URL + file.url; // Imagem vinda do backend
+
           return (
-            <div key={index} className="relative w-24 h-24">
+            <div key={index} style={{ position: "relative", margin: "5px",  marginRight: '25px' }}>
               <img
-                src={previewUrl}
-                alt="preview"
-                className="w-full h-full object-cover rounded-md"
+                src={imageUrl}
+                alt={`Imagem ${index}`}
+                style={{ width: "100px", height: "100px", objectFit: "cover" }}
               />
-              <Button
-                variant="destructive"
-                size="icon"
-                className="absolute top-0 right-0 p-1 rounded-full"
-                onClick={() => removeImage(index)}
+              <button
+                type="button"
+                onClick={() => handleRemoveImage(index)}
+                style={{
+                  position: "absolute",
+                  top: "0",
+                  right: "-15px",
+                  background: "red",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                  padding: '0px 8px 8px',
+                  height: '26px',
+                }}
               >
-                <X size={16} />
-              </Button>
+                x
+              </button>
             </div>
           );
         })}
       </div>
-
-      {images.length > 0 && (
-        <Button variant="destructive" onClick={() => setImages([])}>
-          Remover Todas
-        </Button>
-      )}
     </div>
   );
-}
+};
+
+export default ImageDrop;

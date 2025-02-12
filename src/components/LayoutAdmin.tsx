@@ -17,8 +17,8 @@ export default function LayoutAdmin() {
   const {logout, userData} = useAuth();
   const [breadcrumbItems, setBreadcrumbItems] = useState([
     { label: "Admin", href: "#" },
-    { label: "Propriedades", href: "/admin/property/list" },
-    { label: "Listar", href: "/admin/property/list" },
+    { label: "Propriedades", href: "/admin/properties" },
+    { label: "Listar", href: "/admin/properties" },
   ]);
 
   const user = userData() || { name: "Usuário" };
@@ -42,7 +42,7 @@ export default function LayoutAdmin() {
     navMain: [
       {
         title: "Propriedades",
-        url: "/admin/property/list",
+        url: "/admin/properties",
       },
       {
         title: "Usuários",

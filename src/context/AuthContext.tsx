@@ -32,7 +32,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       await authLogin(email, password);
 
       setAuth(true);
-      navigate("/admin/property/list");
+      navigate("/admin/properties");
     } catch (error) {
       throw error;
     }

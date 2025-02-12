@@ -17,7 +17,7 @@ type LoggedType = {
   token: string;
 }
 
-const API_URL = import.meta.env.VITE_API_URL_BACKEND;
+const API_URL = import.meta.env.VITE_API_URL_BACKEND + '/api/v1/';
 
 export const authLogin = async (email: string, password: string): Promise<LoggedType> => {
   try {
@@ -30,7 +30,7 @@ export const authLogin = async (email: string, password: string): Promise<Logged
 
     if (response.data.token) {
       Cookies.set("u-info", JSON.stringify(response.data.user), { expires: 1 });
-      Cookies.set("u-token", JSON.stringify(response.data.token), { expires: 1 });
+      Cookies.set("u-token", response.data.token, { expires: 1 });
     }
     
     return response.data;

@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosInstance } from "axios";
 import { useAuth } from "@/context/AuthContext";
 import Cookies from "js-cookie";
 
-const API_URL = import.meta.env.VITE_API_URL_BACKEND;
+const API_URL = import.meta.env.VITE_API_URL_BACKEND + '/api/v1/';
 
 const api: AxiosInstance = axios.create({
   baseURL: API_URL,

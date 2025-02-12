@@ -1,72 +1,154 @@
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Pencil, Trash, PlusCircleIcon } from "lucide-react";
-import { useEffect } from "react";
-
-interface IProperty {
-  id: number;
-  number: string;
-  block: string;
-  owner: string;
-  description: string;
-}
-
-const property: IProperty[] = [
-  { id: 1, number: "101", block: "A", owner: "João Silva", description: "Apartamento com 2 quartos" },
-  { id: 2, number: "202", block: "B", owner: "Maria Souza", description: "Apartamento com 3 quartos" },
-  { id: 3, number: "303", block: "C", owner: "Carlos Pereira", description: "Apartamento com 2 quartos" },
-];
+import { useEffect, useState } from "react";
+import { useApi } from "@/service/apiService";
+import { IProperty } from "@/types/Property";
+import useSpinner from "@/hooks/useLoadingStore";
+import { SkeletonList } from "@/components/SkeletonList";
+import DeleteConfirmationModal from "@/components/Modal";
+import { toast } from "react-toastify";
 
 export default function ListProperty() {
+  const { loading, setLoading } = useSpinner();
   const navigate = useNavigate();
-  const { setBreadcrumbItems } = useOutletContext<{ setBreadcrumbItems: (items: { label: string; href: string }[]) => void }>();
+  const api = useApi();
+  const { setBreadcrumbItems } = useOutletContext<{
+    setBreadcrumbItems: (items: { label: string; href: string }[]) => void;
+  }>();
+  const [properties, setProperties] = useState<IProperty[]>([]);
+  const [open, setOpen] = useState<boolean>(false);
+  const [propertyIdToDelete, setPropertyIdToDelete] = useState<string | null>(null);
+
+  const getList = async () => {
+    const { data } = await api.get("/properties");
+  
+    let newData = data;
+  
+    if (data.length > 0) {
+      newData = data.map((item: IProperty) => {
+        const newItem = { ...item };
+        newItem.type = newItem.type === "SALE" ? "Venda" : "Locação";
+  
+        const priceAsNumber = typeof newItem.price === "string" ? parseFloat(newItem.price) : newItem.price;
+  
+        newItem.priceFormatted = priceAsNumber.toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        });
+  
+        return newItem;
+      });
+    }
+  
+    setProperties(newData);
+  };
+
+  const handleDeleteProperty = async () => {
+    if (!propertyIdToDelete) return;
+
+    try {
+      setLoading(true);
+      setOpen(false);
+      await api.delete(`/property/${propertyIdToDelete}/photos`);
+      await api.delete(`/property/${propertyIdToDelete}`);
+      await getList();
+
+      toast.success('Propriedade excluída com sucesso.')
+    } catch (error) {
+      console.error("Erro ao deletar propriedade:", error);
+    } finally {
+      setLoading(false);
+      setPropertyIdToDelete(null);
+    }
+  };
+
+  const openDeleteModal = (id: string) => {
+    setPropertyIdToDelete(id);
+    setOpen(true);
+  };
 
   useEffect(() => {
-    setBreadcrumbItems([
-      { label: 'Admin', href: '#' },
-      { label: 'Propriedades', href: '/admin/property/list' },
-      { label: 'Listar', href: '/admin/property/list' },
-    ]);
-  }, [setBreadcrumbItems]);
+    const fetchData = async () => {
+      setBreadcrumbItems([
+        { label: "Admin", href: "#" },
+        { label: "Propriedades", href: "/admin/properties" },
+        { label: "Listar", href: "/admin/properties" },
+      ]);
+      await getList();
+    };
+    fetchData();
+  }, []);
 
   return (
     <div className="p-6">
-      <div className="flex justify-between mb-4">
-        <h2 className="text-xl font-semibold">Apartamentos</h2>
-        <Button onClick={() => navigate("/admin/property/create")}>
-          <PlusCircleIcon className="w-4 h-4 mr-2" /> Cadastrar novo
-        </Button>
-      </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="text-left">Número</TableHead>
-            <TableHead>Bloco</TableHead>
-            <TableHead>Proprietário</TableHead>
-            <TableHead>Descrição</TableHead>
-            <TableHead className="text-center">Ações</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {property.map((item) => (
-            <TableRow key={item.id}>
-              <TableCell>{item.number}</TableCell>
-              <TableCell>{item.block}</TableCell>
-              <TableCell>{item.owner}</TableCell>
-              <TableCell>{item.description}</TableCell>
-              <TableCell className="flex flex-row justify-center gap-3">
-                <Button variant="outline" size="default" onClick={() => navigate("/admin/property/edit/1")}>
-                  <Pencil className="w-4 h-4" /> Editar
-                </Button>
-                <Button variant="destructive" size="default">
-                  <Trash className="w-4 h-4" /> Excluir
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      {loading ? (
+        <SkeletonList />
+      ) : (
+        <>
+          <div className="flex justify-between mb-4">
+            <h2 className="text-xl font-semibold">Listagem de Propriedades</h2>
+            <Button onClick={() => navigate("/admin/property/create")}>
+              <PlusCircleIcon className="w-4 h-4 mr-2" /> Cadastrar novo
+            </Button>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-left">Título</TableHead>
+                <TableHead>Localização</TableHead>
+                <TableHead>Descrição</TableHead>
+                <TableHead>Preço</TableHead>
+                <TableHead>Tipo</TableHead>
+                <TableHead className="text-center">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {properties.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell>{item.title}</TableCell>
+                  <TableCell>{item.location}</TableCell>
+                  <TableCell>{item.description}</TableCell>
+                  <TableCell>{item.priceFormatted}</TableCell>
+                  <TableCell>{item.type}</TableCell>
+                  <TableCell className="flex flex-row justify-center gap-3">
+                    <Button
+                      variant="outline"
+                      size="default"
+                      onClick={() =>
+                        navigate(`/admin/property/edit/${item.id}`)
+                      }
+                    >
+                      <Pencil className="w-4 h-4" /> Editar
+                    </Button>
+                    <Button 
+                      variant="destructive" 
+                      size="default"
+                      onClick={() => openDeleteModal(item.id.toString())}
+                    >
+                      <Trash className="w-4 h-4" /> Excluir
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <DeleteConfirmationModal
+            isOpen={open}
+            onClose={() => setOpen(false)}
+            onConfirm={handleDeleteProperty}
+            sentence={"Confirma a exclusão desta propriedade?"}
+          />
+        </>
+      )}
     </div>
   );
 }
