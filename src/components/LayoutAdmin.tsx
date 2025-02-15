@@ -8,13 +8,19 @@ import {
 } from "@/components/ui/sidebar";
 import BreadcrumbProvider from "@/context/BreadcrumbContext";
 import { useState } from "react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "react-toastify";
+import { ChevronDownIcon } from "lucide-react";
 
 export default function LayoutAdmin() {
-  const {logout, userData} = useAuth();
+  const { logout, userData } = useAuth();
   const [breadcrumbItems, setBreadcrumbItems] = useState([
     { label: "Admin", href: "#" },
     { label: "Propriedades", href: "/admin/properties" },
@@ -32,7 +38,7 @@ export default function LayoutAdmin() {
 
   const handleLogout = async () => {
     try {
-      await logout()
+      await logout();
     } catch (error) {
       toast.error("Erro ao fazer logout. Tente novamente.");
     }
@@ -45,8 +51,8 @@ export default function LayoutAdmin() {
         url: "/admin/properties",
       },
       {
-        title: "Usuários",
-        url: "#",
+        title: "Frações",
+        url: "/admin/fractions",
       },
     ],
   };
@@ -64,15 +70,26 @@ export default function LayoutAdmin() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-3 px-3 py-2">
+              <Button
+                variant="ghost"
+                className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 transition-colors"
+              >
                 <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white font-bold">
                   {getUserInitials(user.name)}
                 </div>
                 <span className="font-medium">{user.name}</span>
+
+                <ChevronDownIcon className="w-4 h-4 text-gray-500" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
-              <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+            <DropdownMenuContent
+              align="end"
+              className="w-48 border border-gray-200 rounded-lg shadow-sm"
+            >
+              <DropdownMenuItem
+                onClick={handleLogout}
+                className="cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+              >
                 Sair
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -84,7 +101,8 @@ export default function LayoutAdmin() {
         </div>
 
         <footer className="px-6 py-4 text-center text-sm">
-          © {new Date().getFullYear()} Edifício Internacional. Todos os direitos reservados.
+          © {new Date().getFullYear()} Edifício Internacional. Todos os direitos
+          reservados.
         </footer>
       </SidebarInset>
     </SidebarProvider>

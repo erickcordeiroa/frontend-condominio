@@ -1,5 +1,8 @@
 import Layout from "@/components/Layout";
 import LayoutAdmin from "@/components/LayoutAdmin";
+import CreateFraction from "@/pages/admin/fraction/create-fraction";
+import EditFraction from "@/pages/admin/fraction/edit-fraction";
+import ListFraction from "@/pages/admin/fraction/list-fraction";
 import CreateProperty from "@/pages/admin/property/create-property";
 import EditProperty from "@/pages/admin/property/edit-property";
 import ListApartments from "@/pages/admin/property/list-property";
@@ -30,6 +33,10 @@ const AppRoutes: React.FC = () => {
         <Route path="/admin/properties" element={<ListApartments />} />
         <Route path="/admin/property/create" element={<CreateProperty />} />
         <Route path="/admin/property/edit/:id" element={<EditProperty />} />
+
+        <Route path="/admin/fractions" element={<ListFraction />} />
+        <Route path="/admin/fraction/create" element={<CreateFraction />} />
+        <Route path="/admin/fraction/edit/:id" element={<EditFraction />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />
