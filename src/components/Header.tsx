@@ -9,7 +9,7 @@ const Header: React.FC = () => {
   const navigate = useNavigate();
   return (
     <header className="h-[60px] bg-white shadow-md px-6 py-4 flex items-center justify-between">
-      <div className="text-lg font-bold flex items-center gap-2">
+      <div className="text-lg font-bold flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
         <img className="h-6" src={logo} alt="Logo" />
         <span className="text-[#0C3551]">Edifício Internacional</span>
       </div>

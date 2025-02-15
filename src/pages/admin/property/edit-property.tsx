@@ -30,7 +30,7 @@ const propertySchema = z.object({
   contact: z.string().min(1, "O contato é obrigatório"),
   type: z.string().min(1, "O tipo é obrigatório"),
   price: z.string().min(1, "O preço é obrigatório"),
-  images: z.array(z.any()).nonempty("Necessário inserir no mínimo uma imagem e no máximo cinco."),
+  images: z.array(z.any()),
 });
 
 type PropertyFormValues = z.infer<typeof propertySchema>;
