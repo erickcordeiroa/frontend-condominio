@@ -46,6 +46,8 @@ export default function CreateProperty() {
   const {
     handleSubmit,
     control,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<PropertyFormValues>({
     resolver: zodResolver(propertySchema),
@@ -55,14 +57,34 @@ export default function CreateProperty() {
       location: "",
       contact: "",
       type: "",
-      price: "",
+      price: "0",
       images: [],
     },
   });
 
+  const contactValue = watch("contact");
+  const priceValue = watch("price");
+
+  const formatPhone = (value: string): string => {
+    const cleaned = value.replace(/\D/g, "");
+    const match = cleaned.match(/^(\d{2})(\d{5})(\d{4})$/);
+    return match ? `(${match[1]}) ${match[2]}-${match[3]}` : value;
+  };
+
+  const formatCurrency = (value: string) => {
+    const numericValue = value.replace(/\D/g, "");
+    const floatValue = (parseFloat(numericValue) / 100).toFixed(2);
+
+    return floatValue.replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  };
+
   const onSubmit = async (items: PropertyFormValues) => {
     try {
       setLoading(true);
+
+      const priceFormatted = parseFloat(
+        items.price.replace(/\./g, "").replace(",", ".")
+      );
 
       const { data } = await api.post("/property", {
         title: items.title,
@@ -70,7 +92,7 @@ export default function CreateProperty() {
         location: items.location,
         contact: items.contact,
         type: items.type,
-        price: items.price,
+        price: priceFormatted,
       });
 
       // Envia novas imagens
@@ -182,6 +204,13 @@ export default function CreateProperty() {
                 placeholder="Contato do proprietário"
                 required
                 className="mt-2"
+                value={formatPhone(contactValue)}
+                onChange={(e) =>
+                  setValue(
+                    "contact",
+                    formatPhone(e.target.value)
+                  )
+                }
               />
             )}
           />
@@ -234,6 +263,10 @@ export default function CreateProperty() {
                 placeholder="Preço do imóvel"
                 required
                 className="mt-2"
+                value={formatCurrency(priceValue)}
+                  onChange={(e) =>
+                    setValue("price", formatCurrency(e.target.value))
+                  }
               />
             )}
           />

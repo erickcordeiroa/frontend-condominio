@@ -35,7 +35,6 @@ const Login: React.FC = () => {
   });
 
   const onSubmit = async (data: {email: string, password: string}) => {
-    console.log("Dados enviados:", data);
     try {
       setLoading(true);
       await login(data.email, data.password);
@@ -47,17 +46,17 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gradient-to-t from-gray-50 to-gray-100">
+    <div className="flex justify-center items-center h-screen overflow-hidden bg-white">
       {loading ?? <Spinner></Spinner>}
       <Card className="w-full max-w-sm sm:max-w-md md:max-w-lg bg-white shadow-xl rounded-lg p-6">
         <CardHeader className="flex flex-col items-center gap-3">
           <a href="/" className="flex items-center gap-2 mb-3">
             <img className="h-8" src={logo} alt="Logo" />
-            <span className="text-[#0C3551] font-semibold text-lg">
+            <span className="text-[#0C3551] font-semibold text-lg md:text-xl">
               Edifício Internacional
             </span>
           </a>
-          <CardDescription className="text-center text-gray-600">
+          <CardDescription className="text-center text-sm md:text-base text-gray-600">
             Informe seu e-mail e senha para continuar
           </CardDescription>
         </CardHeader>
@@ -65,7 +64,7 @@ const Login: React.FC = () => {
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="grid gap-5">
             <div className="grid gap-2">
-              <Label htmlFor="email" className="text-sm text-gray-700">
+              <Label htmlFor="email" className="text-sm md:text-base text-gray-700">
                 E-mail:
               </Label>
               <Input
@@ -81,12 +80,12 @@ const Login: React.FC = () => {
 
             <div className="grid gap-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-sm text-gray-700">
+                <Label htmlFor="password" className="text-sm md:text-base text-gray-700">
                   Senha:
                 </Label>
                 <Link
                   to="/forgot-password"
-                  className="text-sm text-blue-900 hover:text-blue-700 transition"
+                  className="hidden text-sm text-blue-900 hover:text-blue-700 transition"
                 >
                   Esqueceu sua senha?
                 </Link>
@@ -107,7 +106,7 @@ const Login: React.FC = () => {
               </Button>
             </div>
 
-            <div className="flex justify-center text-gray-600 text-sm">
+            <div className="flex justify-center text-gray-600 text-sm md:text-base">
               <span>Não tem uma conta?</span>
               <Link
                 to="/register"

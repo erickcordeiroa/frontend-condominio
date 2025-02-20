@@ -1,93 +1,281 @@
-import { useState } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Autoplay } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/navigation";
+import { useEffect, useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Link } from "react-router-dom";
+import { useApi } from "@/service/apiService";
+import useSpinner from "@/hooks/useLoadingStore";
+import { IFraction } from "@/types/Fraction";
+import imgEdif1 from "@/assets/images/ed_inter01.jpg";
+import imgEdif2 from "@/assets/images/ed_inter02.jpg";
+import imgEdif3 from "@/assets/images/ed_inter03.jpg";
 
-const images = [
-  "https://fastly.picsum.photos/id/40/4106/2806.jpg?hmac=MY3ra98ut044LaWPEKwZowgydHZ_rZZUuOHrc3mL5mI",
-  "https://fastly.picsum.photos/id/49/1280/792.jpg?hmac=NnUJy0O9-pXHLmY2loqVs2pJmgw9xzuixgYOk4ALCXU",
-  "https://fastly.picsum.photos/id/55/4608/3072.jpg?hmac=ahGhylwdN52ULB37deeMZX6T_G7NiERtoPhwydMvUKQ",
-];
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
 
 export default function Home() {
-  const [type, setType] = useState("loja");
-  const [number, setNumber] = useState("");
-  const [rateio, setRateio] = useState("");
+  const api = useApi();
+  const { loading, setLoading, Spinner } = useSpinner();
   const [result, setResult] = useState<number | null>(null);
+  const [fraction, setFractions] = useState<IFraction[]>([]);
 
-  const calculate = () => {
-    if (!number || !rateio) return;
-    const value = parseFloat(rateio) * (type === "loja" ? 1.2 : 1.0);
-    setResult(value);
+  const schema = z.object({
+    type: z.enum(["LOJA", "APTO"]),
+    location: z
+      .string()
+      .min(1, "A localização é obrigatória")
+      .refine(
+        (val) => fraction.some((f) => f.location === val),
+        "Número não encontrado."
+      ),
+    rateio: z.string().min(1, "Informe um valor válido"),
+  });
+
+  type calcFormValues = z.infer<typeof schema>;
+
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<calcFormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      type: "LOJA",
+      location: "",
+      rateio: "0",
+    },
+  });
+
+  const rateioValue = watch("rateio");
+
+  const formatCurrency = (value: string) => {
+    const numericValue = value.replace(/\D/g, "");
+    const floatValue = (parseFloat(numericValue) / 100).toFixed(2);
+
+    return floatValue.replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
 
+  const getList = async () => {
+    try {
+      setLoading(true);
+      const { data } = await api.get("/fractions");
+
+      setFractions(data);
+    } catch (error) {
+      console.error("Erro ao listar propriedades:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCalculate = (data: calcFormValues) => {
+    const { type, location, rateio } = data;
+
+    const rateioFormatted = parseFloat(
+      rateio.replace(/\./g, "").replace(",", ".")
+    );
+    const findFraction = fraction.find(
+      (item: IFraction) => item.location === location && item.type === type
+    );
+
+    if (!findFraction) {
+      alert("Localização não encontrada para o tipo selecionado.");
+      return;
+    }
+
+    const valueToPay = rateioFormatted * findFraction.fraction;
+    console.log(valueToPay);
+    setResult(valueToPay);
+  };
+
+  useEffect(() => {
+    getList();
+  }, []);
+
   return (
-    <div className="flex flex-col md:flex-row items-center justify-center min-h-screen w-screen p-6 bg-gradient-to-br from-gray-50 to-gray-100 gap-12">
-      {/* Swiper (Carrossel) */}
-      <div className="w-full md:w-2/3 h-[500px] rounded-3xl overflow-hidden shadow-2xl">
-        <Swiper
-          modules={[Navigation, Autoplay]}
-          navigation
-          autoplay={{ delay: 3000 }}
-          loop
-          className="rounded-3xl h-full"
-        >
-          {images.map((image, index) => (
-            <SwiperSlide key={index}>
-              <img src={image} alt={`Slide ${index + 1}`} className="w-full h-full object-cover rounded-3xl" />
+    <div className="flex flex-col md:flex-row items-center justify-center min-h-screen p-6 bg-white gap-12 overflow-hidden">
+      <div className="flex flex-col items-center md:mr-5 lg:mr-14 md:w-1/2">
+        <div className="flex flex-col text-[#0C3551] text-center mb-8">
+          <span className="text-lg md:text-xl lg:text-2xl font-semibold mb-1">
+            Seja bem-vindo ao
+          </span>
+          <span className="text-lg md:text-2xl lg:text-4xl font-bold mb-3">
+            Edifício
+          </span>
+          <span className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gradient bg-clip-text text-transparent bg-gradient-to-r from-sky-700 to-sky-900">
+            Internacional
+          </span>
+        </div>
+
+        <div className="w-full max-w-md flex justify-center items-center">
+          <Swiper
+            centeredSlides={true}
+            autoplay={{
+              delay: 3000,
+              disableOnInteraction: false,
+            }}
+            modules={[Autoplay]}
+            className="rounded h-[250px] lg:h-[400px] flex items-center justify-center"
+          >
+            <SwiperSlide className="flex justify-center">
+              <img
+                src={imgEdif1}
+                alt="Imagem do Edifício"
+                className="w-full h-full object-cover rounded shadow-lg"
+              />
             </SwiperSlide>
-          ))}
-        </Swiper>
+            <SwiperSlide className="flex justify-center">
+              <img
+                src={imgEdif2}
+                alt="Imagem do Edifício"
+                className="w-full h-full object-cover rounded shadow-lg"
+              />
+            </SwiperSlide>
+            <SwiperSlide className="flex justify-center">
+              <img
+                src={imgEdif3}
+                alt="Imagem do Edifício"
+                className="w-full h-full object-cover rounded shadow-lg"
+              />
+            </SwiperSlide>
+          </Swiper>
+        </div>
+
+        <Link
+          to="/properties"
+          className="text-sm md:text-base lg:text-xl text-blue-900 hover:text-blue-700 transition mt-10 md:mt-16 cursor-pointer"
+        >
+          Veja nossas propriedades
+        </Link>
       </div>
 
-      {/* Formulário de Cálculo */}
-      <div className="w-full md:w-1/3 h-[500px] bg-white p-8 rounded-3xl shadow-2xl flex flex-col justify-center">
-        <h2 className="text-center text-2xl font-bold text-gray-900 mb-6">Cálculo de Rateio</h2>
-        <div className="space-y-6">
-          {/* Tipo de Rateio */}
+      <div className="w-full md:w-1/2 lg:w-[40%] bg-white px-8 py-10 rounded-3xl shadow-2xl flex flex-col justify-center">
+        <h2 className="text-center text-lg md:text-xl lg:text-2xl font-bold text-[#09273c] mt-2 md:mt-4 mb-6 md:mb-10">
+          Simule o valor do rateio do condomínio
+        </h2>
+        <form
+          onSubmit={handleSubmit(handleCalculate)}
+          className="space-y-6 md:space-y-8"
+        >
           <div>
-            <Label className="text-sm font-medium text-gray-700">Selecione o tipo:</Label>
-            <RadioGroup defaultValue="loja" className="mt-3" onValueChange={setType}>
-              <div className="flex items-center space-x-6">
-                <div className="flex items-center space-x-3">
-                  <RadioGroupItem value="loja" id="loja" />
-                  <Label htmlFor="loja" className="text-sm">Loja</Label>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <RadioGroupItem value="apartamento" id="apartamento" />
-                  <Label htmlFor="apartamento" className="text-sm">Apartamento</Label>
-                </div>
-              </div>
-            </RadioGroup>
+            <Label className="text-sm md:text-base font-medium text-gray-700">
+              Selecione o tipo:
+            </Label>
+            <Controller
+              name="type"
+              control={control}
+              render={({ field }) => (
+                <RadioGroup
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  className="mt-3"
+                >
+                  <div className="flex items-center space-x-6">
+                    <div className="flex items-center justify-center space-x-3">
+                      <RadioGroupItem value="LOJA" id="LOJA" />
+                      <Label
+                        htmlFor="LOJA"
+                        className="text-sm mb-0 md:text-base"
+                      >
+                        Loja
+                      </Label>
+                    </div>
+                    <div className="flex items-center justify-center space-x-3">
+                      <RadioGroupItem value="APTO" id="APTO" />
+                      <Label
+                        htmlFor="APTO"
+                        className="text-sm mb-0 md:text-base"
+                      >
+                        Apartamento
+                      </Label>
+                    </div>
+                  </div>
+                </RadioGroup>
+              )}
+            />
           </div>
 
-          {/* Número da Loja/Apartamento */}
           <div>
-            <Label htmlFor="number" className="text-sm font-medium text-gray-700">Número:</Label>
-            <Input id="number" type="number" placeholder="Ex: 101" value={number} onChange={(e) => setNumber(e.target.value)} className="mt-2" />
+            <Label
+              htmlFor="location"
+              className="text-sm md:text-base font-medium text-gray-700"
+            >
+              Número do seu apartamento ou loja:
+            </Label>
+            <Controller
+              name="location"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  placeholder="Ex: 09"
+                  className="mt-2"
+                  onChange={(e) =>
+                    setValue(
+                      "location",
+                      Number(e.target.value).toString().padStart(2, "0")
+                    )
+                  }
+                />
+              )}
+            />
+            {errors.location && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.location.message}
+              </p>
+            )}
           </div>
 
-          {/* Valor do Rateio */}
           <div>
-            <Label htmlFor="rateio" className="text-sm font-medium text-gray-700">Valor do Rateio (R$):</Label>
-            <Input id="rateio" type="number" placeholder="Ex: 150.00" value={rateio} onChange={(e) => setRateio(e.target.value)} className="mt-2" />
+            <Label
+              htmlFor="rateio"
+              className="text-sm md:text-base font-medium text-gray-700"
+            >
+              Valor do Rateio (R$):
+            </Label>
+            <Controller
+              name="rateio"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  placeholder="Ex: 150,00"
+                  className="mt-2"
+                  value={formatCurrency(rateioValue)}
+                  onChange={(e) =>
+                    setValue("rateio", formatCurrency(e.target.value))
+                  }
+                />
+              )}
+            />
+            {errors.rateio && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.rateio.message}
+              </p>
+            )}
           </div>
 
-          {/* Botão de Calcular */}
-          <Button onClick={calculate} className="w-full">Calcular</Button>
+          <Button type="submit" className="w-full">
+            Calcular
+          </Button>
 
-          {/* Resultado */}
           {result !== null && (
-            <div className="text-center mt-4 text-xl font-bold text-gray-900">
-              Valor a pagar: R$ {result.toFixed(2)}
+            <div className="text-center mt-4 text-base md:text-xl text-gray-900">
+              <p>Valor a pagar</p>
+              <p className="font-bold">
+                R$ {formatCurrency(result.toString())}
+              </p>
             </div>
           )}
-        </div>
+        </form>
       </div>
     </div>
   );

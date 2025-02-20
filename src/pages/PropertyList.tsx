@@ -16,11 +16,13 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
 } from "@/components/ui/breadcrumb";
-import { ChevronRight } from "lucide-react";
+import { CameraOffIcon, ChevronRight } from "lucide-react";
 import { useApi } from "@/service/apiService";
 import { IProperty } from "@/types/Property";
 import useSpinner from "@/hooks/useLoadingStore";
 import { Pagination } from "@/components/Pagination";
+
+const API_URL = import.meta.env.VITE_API_URL_BACKEND;
 
 function PropertyList() {
   const [properties, setProperties] = useState<IProperty[]>([]);
@@ -86,7 +88,7 @@ function PropertyList() {
   );
 
   return (
-    <div className="p-6">
+    <div className="p-6 bg-white min-h-screen">
       {loading ? (
         <Spinner />
       ) : (
@@ -106,10 +108,10 @@ function PropertyList() {
           </Breadcrumb>
 
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-4">
-            <h1 className="text-2xl font-bold">
+            <h1 className="text-xl md:text-2xl font-bold">
               Todas as propriedades disponíveis
             </h1>
-            <div className="flex gap-4">
+            <div className="flex flex-col md:flex-row mt-2 md:mt-0 gap-4">
               <Input
                 placeholder="Buscar propriedade..."
                 value={searchQuery}
@@ -117,7 +119,7 @@ function PropertyList() {
                 className="w-64 bg-slate-100"
               />
               <Select onValueChange={setSortOption}>
-                <SelectTrigger className="w-52 bg-slate-100">
+                <SelectTrigger className="bg-slate-100 w-[256px]">
                   <SelectValue placeholder="Ordenar por" />
                 </SelectTrigger>
                 <SelectContent>
@@ -147,14 +149,22 @@ function PropertyList() {
                     <CardTitle>{property.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <img
-                      src={
-                        property.photos.find((photo) => photo.isFeatured)
-                          ?.url || "/default-image.jpg"
-                      }
-                      alt={property.title}
-                      className="w-full h-60 object-cover rounded-lg"
-                    />
+                    {property.photos[0].url ? (
+                      <img
+                        src={
+                          property.photos[0].url
+                            ? API_URL + property.photos[0].url
+                            : "/default-image.jpg"
+                        }
+                        alt={property.title}
+                        className="w-full h-60 object-cover rounded-lg"
+                      />
+                    ) : (
+                      <div className="w-full h-60 rounded bg-slate-200 flex items-center justify-center">
+                        <CameraOffIcon width={50} height={40} />
+                      </div>
+                    )}
+
                     <p className="mt-2 text-lg font-semibold">
                       {property.priceFormatted}
                     </p>

@@ -55,6 +55,8 @@ export default function EditProperty() {
     handleSubmit,
     control,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<PropertyFormValues>({
     resolver: zodResolver(propertySchema),
@@ -68,6 +70,22 @@ export default function EditProperty() {
       images: [],
     },
   });
+
+  const contactValue = watch("contact");
+  const priceValue = watch("price");
+
+  const formatPhone = (value: string): string => {
+    const cleaned = value.replace(/\D/g, "");
+    const match = cleaned.match(/^(\d{2})(\d{5})(\d{4})$/);
+    return match ? `(${match[1]}) ${match[2]}-${match[3]}` : value;
+  };
+
+  const formatCurrency = (value: string) => {
+    const numericValue = value.replace(/\D/g, "");
+    const floatValue = (parseFloat(numericValue) / 100).toFixed(2);
+
+    return floatValue.replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  };
 
   // Função para deletar uma imagem específica
   const handleDeleteImage = async (imageId: string) => {
@@ -103,6 +121,8 @@ export default function EditProperty() {
           ...data,
           type: data.type === "SALE" ? "SALE" : "RENT",
           images: data.photos || [],
+          price: formatCurrency(data.price.toString()),
+          contact: formatPhone(data.contact),
         };
         setDefaultImages(data.photos || []);
         setProperty(formattedData);
@@ -118,13 +138,17 @@ export default function EditProperty() {
     try {
       setLoading(true);
 
+      const priceFormatted = parseFloat(
+        data.price.replace(/\./g, "").replace(",", ".")
+      );
+
       await api.put(`/property/${id}`, {
         title: data.title,
         description: data.description,
         location: data.location,
         contact: data.contact,
         type: data.type,
-        price: data.price,
+        price: priceFormatted,
       });
 
       // Exclui imagens marcadas para remoção
@@ -265,6 +289,10 @@ export default function EditProperty() {
                     placeholder="Contato do proprietário"
                     required
                     className="mt-2"
+                    value={formatPhone(contactValue)}
+                    onChange={(e) =>
+                      setValue("contact", formatPhone(e.target.value))
+                    }
                   />
                 )}
               />
@@ -317,6 +345,10 @@ export default function EditProperty() {
                     placeholder="Preço do imóvel"
                     required
                     className="mt-2"
+                    value={formatCurrency(priceValue)}
+                    onChange={(e) =>
+                      setValue("price", formatCurrency(e.target.value))
+                    }
                   />
                 )}
               />

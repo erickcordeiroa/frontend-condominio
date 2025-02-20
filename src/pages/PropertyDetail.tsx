@@ -4,12 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Mousewheel, Keyboard } from "swiper/modules";
+import { Navigation, Autoplay } from "swiper/modules";
 
 import "swiper/css";
-import "swiper/css/effect-fade";
 import "swiper/css/navigation";
-import "swiper/css/pagination";
+
 import { IProperty } from "@/types/Property";
 import { useApi } from "@/service/apiService";
 import useSpinner from "@/hooks/useLoadingStore";
@@ -57,14 +56,14 @@ export default function PropertyDetail() {
   if (!property) return <p>Propriedade não encontrada.</p>;
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-6 max-w-6xl mx-auto bg-white">
       {loading ? (
         <Spinner />
       ) : (
         <>
           <Button
             variant="outline"
-            className="mb-4"
+            className="mb-4 border-slate-200"
             size="default"
             onClick={() => navigate("/properties")}
           >
@@ -73,26 +72,18 @@ export default function PropertyDetail() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <Swiper
-                cssMode={true}
-                navigation={true}
-                pagination={true}
-                mousewheel={true}
-                keyboard={true}
-                modules={[Navigation, Pagination, Mousewheel, Keyboard]}
-                className="mySwiper"
-                style={
-                  {
-                    "--swiper-navigation-color": "#264073",
-                    "--swiper-pagination-color": "#264073",
-                  } as React.CSSProperties
-                }
+                navigation
+                autoplay={{ delay: 3000 }}
+                loop
+                modules={[Navigation, Autoplay]}
+                className="rounded-xl h-full"
               >
                 {property.photos.map((image, index) => (
                   <SwiperSlide key={index}>
                     <img
                       src={API_URL + image.url}
                       alt={`Imagem ${index + 1} da propriedade`}
-                      className="w-full h-[400px] md:h-[600px] object-cover"
+                      className="w-full h-[400px] md:h-[600px] object-cover rounded-xl"
                     />
                   </SwiperSlide>
                 ))}
@@ -100,11 +91,11 @@ export default function PropertyDetail() {
             </div>
 
             <div className="flex flex-col justify-between">
-              <CardHeader>
-                <CardTitle className="text-3xl font-bold">
+              <CardHeader className="gap-2 md:gap-4">
+                <CardTitle className="text-xl md:text-2xl lg:text-3xl font-bold">
                   {property.title}
                 </CardTitle>
-                <p className="text-xl font-semibold text-gray-700">
+                <p className="text-lg md:text-xl font-semibold text-gray-700">
                   {property.priceFormatted}
                 </p>
                 <p className="text-lg text-gray-600">{property.type}</p>
@@ -118,7 +109,7 @@ export default function PropertyDetail() {
           <div className="mt-8">
             <Card>
               <CardHeader>
-                <CardTitle className="text-xl">Descrição</CardTitle>
+                <CardTitle className="text-lg md:text-xl">Descrição</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-700">{property.description}</p>

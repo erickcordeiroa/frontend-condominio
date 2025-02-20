@@ -4,9 +4,9 @@ import Header from "./Header";
 
 const Layout: React.FC = () => {
   return (
-    <div className="flex flex-col justify-between min-h-screen">
+    <div className="flex flex-col justify-between">
       <Header />
-      <main className="flex-1"><Outlet /></main>
+      <main className="flex-1 bg-white"><Outlet /></main>
       <Footer />
     </div>
   );
