@@ -35,30 +35,37 @@ export default function ListFraction() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const getList = async () => {
-    const { data } = await api.get("/fractions");
+    try {
+      setLoading(true);
+      const { data } = await api.get("/fractions");
 
-    let newData = data;
+      let newData = data;
 
-    if (data.length > 0) {
-      newData = data.map((item: IFraction) => {
-        const newItem = { ...item };
-        newItem.type = newItem.type === "LOJA" ? "Loja" : "Apartamento";
+      if (data.length > 0) {
+        newData = data.map((item: IFraction) => {
+          const newItem = { ...item };
+          newItem.type = newItem.type === "LOJA" ? "Loja" : "Apartamento";
 
-        const fractionAsNumber =
-          typeof newItem.fraction === "string"
-            ? parseFloat(newItem.fraction)
-            : newItem.fraction;
+          const fractionAsNumber =
+            typeof newItem.fraction === "string"
+              ? parseFloat(newItem.fraction)
+              : newItem.fraction;
 
-        newItem.fractionFormatted = fractionAsNumber.toLocaleString("pt-BR", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
+          newItem.fractionFormatted = fractionAsNumber.toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          });
+
+          return newItem;
         });
+      }
 
-        return newItem;
-      });
+      setFractions(newData);
+    } catch (error) {
+      console.error("Erro ao buscar as frações:", error);
+    } finally {
+      setLoading(false);
     }
-
-    setFractions(newData);
   };
 
   const handleDeleteFraction = async () => {
@@ -137,7 +144,7 @@ export default function ListFraction() {
               {paginatedFractions.map((item: IFraction) => (
                 <TableRow key={item.id}>
                   <TableCell>{item.location}</TableCell>
-                  <TableCell>{item.fraction}</TableCell>
+                  <TableCell>{(item.fraction).toString().replace(".", ",")}</TableCell>
                   <TableCell>{item.type}</TableCell>
                   <TableCell className="flex flex-row justify-center gap-3">
                     <Button

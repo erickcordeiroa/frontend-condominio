@@ -212,10 +212,7 @@ export default function EditProperty() {
         <div>
           <h2 className="text-xl font-semibold mb-4">Editar Propriedade</h2>
           <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSubmit(onSubmit);
-            }}
+            onSubmit={handleSubmit(onSubmit)}
             className="space-y-4"
           >
             <div>
@@ -394,6 +391,7 @@ export default function EditProperty() {
               <Button
                 variant="outline"
                 size="default"
+                type="button"
                 onClick={() => navigate("/admin/properties")}
               >
                 Voltar

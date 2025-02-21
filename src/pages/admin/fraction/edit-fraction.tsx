@@ -43,6 +43,8 @@ export default function EditFraction() {
     handleSubmit,
     control,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<FractionFormValues>({
     resolver: zodResolver(fractionSchema),
@@ -53,10 +55,19 @@ export default function EditFraction() {
     },
   });
 
+  const fractionValue = watch("fraction");
+
+  const formattedFraction = (fractionValue: string) => {
+    return fractionValue.replace(/[^0-9,]/g, "");
+  };
+
   const getFraction = async () => {
     try {
       setLoading(true);
       const { data } = await api.get(`/fraction/${id}`);
+
+      const formattedFraction = data.fraction.toString().replace(".", ",");
+      data.fraction = formattedFraction;
 
       setFraction(data);
       reset(data);
@@ -70,10 +81,12 @@ export default function EditFraction() {
     try {
       setLoading(true);
 
+      const fractionChange = Number(items.fraction.replace(",", "."));
+
       const { data } = await api.put(`/fraction/update/${id}`, {
         location: items.location,
         type: items.type,
-        fraction: Number(items.fraction),
+        fraction: fractionChange,
       });
 
       navigate("/admin/fractions");
@@ -91,8 +104,8 @@ export default function EditFraction() {
     const fetchData = async () => {
       setBreadcrumbItems([
         { label: "Admin", href: "/admin" },
-      { label: "Frações", href: "/admin/fractions" },
-      { label: "Editar", href: `/admin/fraction/edit/${id}` },
+        { label: "Frações", href: "/admin/fractions" },
+        { label: "Editar", href: `/admin/fraction/edit/${id}` },
       ]);
       await getFraction();
     };
@@ -168,9 +181,13 @@ export default function EditFraction() {
             render={({ field }) => (
               <Input
                 {...field}
-                placeholder="Fração"
+                placeholder="Exemplo: 0,5 para 50%"
                 required
                 className="mt-2"
+                value={formattedFraction(fractionValue)}
+                onChange={(e) =>
+                  setValue("fraction", formattedFraction(e.target.value))
+                }
               />
             )}
           />
@@ -184,6 +201,7 @@ export default function EditFraction() {
         <div className="flex justify-between">
           <Button
             variant="outline"
+            type="button"
             size="default"
             onClick={() => navigate("/admin/fractions")}
           >

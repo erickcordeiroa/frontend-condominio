@@ -35,30 +35,37 @@ export default function ListProperty() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const getList = async () => {
-    const { data } = await api.get("/properties");
+    try {
+      setLoading(true);
+      const { data } = await api.get("/properties");
 
-    let newData = data;
+      let newData = data;
 
-    if (data.length > 0) {
-      newData = data.map((item: IProperty) => {
-        const newItem = { ...item };
-        newItem.type = newItem.type === "SALE" ? "Venda" : "Locação";
+      if (data.length > 0) {
+        newData = data.map((item: IProperty) => {
+          const newItem = { ...item };
+          newItem.type = newItem.type === "SALE" ? "Venda" : "Locação";
 
-        const priceAsNumber =
-          typeof newItem.price === "string"
-            ? parseFloat(newItem.price)
-            : newItem.price;
+          const priceAsNumber =
+            typeof newItem.price === "string"
+              ? parseFloat(newItem.price)
+              : newItem.price;
 
-        newItem.priceFormatted = priceAsNumber.toLocaleString("pt-BR", {
-          style: "currency",
-          currency: "BRL",
+          newItem.priceFormatted = priceAsNumber.toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+          });
+
+          return newItem;
         });
+      }
 
-        return newItem;
-      });
+      setProperties(newData);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
-
-    setProperties(newData);
   };
 
   const handleDeleteProperty = async () => {

@@ -39,6 +39,8 @@ export default function CreateFraction() {
     handleSubmit,
     control,
     formState: { errors },
+    setValue,
+    watch,
   } = useForm<PropertyFormValues>({
     resolver: zodResolver(propertySchema),
     defaultValues: {
@@ -48,14 +50,22 @@ export default function CreateFraction() {
     },
   });
 
+  const fractionValue = watch("fraction");
+
+  const formattedFraction = (fractionValue: string) => {
+    return fractionValue.replace(/[^0-9,]/g, "");
+  };
+
   const onSubmit = async (items: PropertyFormValues) => {
     try {
       setLoading(true);
 
+      const fractionChange = Number(items.fraction.replace(",", "."));
+
       const { data } = await api.post("/fraction/create", {
         location: items.location,
         type: items.type,
-        fraction: Number(items.fraction),
+        fraction: fractionChange,
       });
 
       navigate("/admin/fractions");
@@ -141,9 +151,13 @@ export default function CreateFraction() {
             render={({ field }) => (
               <Input
                 {...field}
-                placeholder="Fração"
+                placeholder="Exemplo: 0,5 para 50%"
                 required
                 className="mt-2"
+                value={formattedFraction(fractionValue)}
+                onChange={(e) =>
+                  setValue("fraction", formattedFraction(e.target.value))
+                }
               />
             )}
           />
