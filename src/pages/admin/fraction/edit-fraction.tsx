@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,7 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { IFraction } from "@/types/Fraction";
 
 const fractionSchema = z.object({
   location: z.string().min(1, "A localização é obrigatória"),
@@ -28,12 +27,10 @@ const fractionSchema = z.object({
 type FractionFormValues = z.infer<typeof fractionSchema>;
 
 export default function EditFraction() {
-  const { loading, setLoading } = useSpinner();
+  const { setLoading } = useSpinner();
   const api = useApi();
   const navigate = useNavigate();
   const { id } = useParams();
-
-  const [fraction, setFraction] = useState<IFraction | null>(null);
 
   const { setBreadcrumbItems } = useOutletContext<{
     setBreadcrumbItems: (items: { label: string; href: string }[]) => void;
@@ -69,7 +66,6 @@ export default function EditFraction() {
       const formattedFraction = data.fraction.toString().replace(".", ",");
       data.fraction = formattedFraction;
 
-      setFraction(data);
       reset(data);
     } catch (error) {
     } finally {
@@ -83,7 +79,7 @@ export default function EditFraction() {
 
       const fractionChange = Number(items.fraction.replace(",", "."));
 
-      const { data } = await api.put(`/fraction/update/${id}`, {
+      await api.put(`/fraction/update/${id}`, {
         location: items.location,
         type: items.type,
         fraction: fractionChange,
@@ -115,12 +111,7 @@ export default function EditFraction() {
   return (
     <div className="p-6">
       <h2 className="text-xl font-semibold mb-4">Editar Fração</h2>
-      <form
-        onSubmit={
-          handleSubmit(onSubmit)
-        }
-        className="space-y-4"
-      >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <Label>Localização</Label>
           <Controller

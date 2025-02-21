@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,7 +27,7 @@ const propertySchema = z.object({
 type PropertyFormValues = z.infer<typeof propertySchema>;
 
 export default function CreateFraction() {
-  const { loading, setLoading } = useSpinner();
+  const { setLoading } = useSpinner();
   const api = useApi();
   const navigate = useNavigate();
 
@@ -62,7 +62,7 @@ export default function CreateFraction() {
 
       const fractionChange = Number(items.fraction.replace(",", "."));
 
-      const { data } = await api.post("/fraction/create", {
+      await api.post("/fraction/create", {
         location: items.location,
         type: items.type,
         fraction: fractionChange,

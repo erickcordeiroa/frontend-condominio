@@ -6,7 +6,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useNavigate, useOutletContext, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { IProperty } from "@/types/Property";
 import { useApi } from "@/service/apiService";
 import { z } from "zod";
 import {
@@ -38,7 +37,6 @@ type PropertyFormValues = z.infer<typeof propertySchema>;
 export default function EditProperty() {
   const { loading, setLoading } = useSpinner();
 
-  const [property, setProperty] = useState<IProperty | null>(null);
   const [defaultImages, setDefaultImages] = useState<
     { id: string; url: string }[]
   >([]);
@@ -125,7 +123,7 @@ export default function EditProperty() {
           contact: formatPhone(data.contact),
         };
         setDefaultImages(data.photos || []);
-        setProperty(formattedData);
+
         reset(formattedData);
       }
     } catch (error) {
@@ -211,10 +209,7 @@ export default function EditProperty() {
       ) : (
         <div>
           <h2 className="text-xl font-semibold mb-4">Editar Propriedade</h2>
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="space-y-4"
-          >
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <Label>Título</Label>
               <Controller

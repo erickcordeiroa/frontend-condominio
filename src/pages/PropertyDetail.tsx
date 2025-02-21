@@ -6,9 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
 
-import "swiper/css";
-import "swiper/css/navigation";
-
 import { IProperty } from "@/types/Property";
 import { useApi } from "@/service/apiService";
 import useSpinner from "@/hooks/useLoadingStore";

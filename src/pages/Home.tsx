@@ -16,12 +16,10 @@ import imgEdif3 from "@/assets/images/ed_inter03.jpg";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/navigation";
 
 export default function Home() {
   const api = useApi();
-  const { loading, setLoading, Spinner } = useSpinner();
+  const { setLoading } = useSpinner();
   const [result, setResult] = useState<number | null>(null);
   const [fraction, setFractions] = useState<IFraction[]>([]);
 
