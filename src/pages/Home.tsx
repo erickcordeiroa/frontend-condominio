@@ -13,14 +13,16 @@ import { IFraction } from "@/types/Fraction";
 import imgEdif1 from "@/assets/images/ed_inter01.jpg";
 import imgEdif2 from "@/assets/images/ed_inter02.jpg";
 import imgEdif3 from "@/assets/images/ed_inter03.jpg";
-
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay } from "swiper/modules";
+import { Autoplay } from "swiper";
+
+import "swiper/css";
+import "swiper/css/navigation";
 
 export default function Home() {
   const api = useApi();
   const { setLoading } = useSpinner();
-  const [result, setResult] = useState<number | null>(null);
+  const [result, setResult] = useState<string | null>(null);
   const [fraction, setFractions] = useState<IFraction[]>([]);
 
   const schema = z.object({
@@ -42,6 +44,7 @@ export default function Home() {
     handleSubmit,
     setValue,
     watch,
+    reset,
     formState: { errors },
   } = useForm<calcFormValues>({
     resolver: zodResolver(schema),
@@ -89,9 +92,13 @@ export default function Home() {
       return;
     }
 
-    const valueToPay = rateioFormatted * findFraction.fraction;
-    console.log(valueToPay);
-    setResult(valueToPay);
+    const valueToPay = (rateioFormatted * findFraction.fraction).toFixed(2);
+    setResult(formatCurrency(valueToPay.toString()));
+  };
+
+  const handleReset = () => {
+    reset();
+    setResult(null);
   };
 
   useEffect(() => {
@@ -261,16 +268,25 @@ export default function Home() {
             )}
           </div>
 
-          <Button type="submit" className="w-full">
-            Calcular
-          </Button>
+          <div className="flex gap-4">
+            <Button
+              type="button"
+              onClick={handleReset}
+              disabled={result === null}
+              className="w-full bg-gray-400 hover:bg-gray-500"
+            >
+              Limpar
+            </Button>
+
+            <Button type="submit" className="w-full">
+              Calcular
+            </Button>
+          </div>
 
           {result !== null && (
             <div className="text-center mt-4 text-base md:text-xl text-gray-900">
               <p>Valor a pagar</p>
-              <p className="font-bold">
-                R$ {formatCurrency(result.toString())}
-              </p>
+              <p className="font-bold">R$ {result}</p>
             </div>
           )}
         </form>

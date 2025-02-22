@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
 
+import "swiper/css";
+import "swiper/css/navigation";
+
 import { IProperty } from "@/types/Property";
 import { useApi } from "@/service/apiService";
 import useSpinner from "@/hooks/useLoadingStore";
@@ -21,34 +24,35 @@ export default function PropertyDetail() {
   const navigate = useNavigate();
   const api = useApi();
 
+  const getProperty = async () => {
+    try {
+      setLoading(true);
+      const { data } = await api.get(`/property/${id}`);
+
+      const formattedProperty = {
+        ...data,
+        type: data.type === "SALE" ? "Venda" : "Locação",
+        priceFormatted: (typeof data.price === "string"
+          ? parseFloat(data.price)
+          : data.price
+        ).toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        }),
+      };
+
+      setProperty(formattedProperty);
+    } catch (error) {
+      console.error("Erro ao buscar propriedade:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   useEffect(() => {
-    const fetchProperty = async () => {
-      try {
-        setLoading(true);
-        const { data } = await api.get(`/property/${id}`);
-
-        const formattedProperty = {
-          ...data,
-          type: data.type === "SALE" ? "Venda" : "Locação",
-          priceFormatted: (typeof data.price === "string"
-            ? parseFloat(data.price)
-            : data.price
-          ).toLocaleString("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-          }),
-        };
-
-        setProperty(formattedProperty);
-      } catch (error) {
-        console.error("Erro ao buscar propriedade:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProperty();
-  }, [id]);
+    getProperty()
+  }, []);
 
   if (!property) return <p>Propriedade não encontrada.</p>;
 
