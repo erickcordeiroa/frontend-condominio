@@ -3,24 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-} from "@/components/ui/breadcrumb";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink } from "@/components/ui/breadcrumb";
 import { CameraOffIcon, ChevronRight } from "lucide-react";
 import { useApi } from "@/service/apiService";
 import { IProperty } from "@/types/Property";
 import useSpinner from "@/hooks/useLoadingStore";
 import { Pagination } from "@/components/Pagination";
+import { Badge } from "@/components/ui/badge";
 
 const API_URL = import.meta.env.VITE_API_URL_BACKEND;
 
@@ -29,6 +20,7 @@ function PropertyList() {
   const { loading, setLoading, Spinner } = useSpinner();
   const [sortOption, setSortOption] = useState<string>("default");
   const [searchQuery, setSearchQuery] = useState("");
+  const [filterType, setFilterType] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const api = useApi();
   const propertiesPerPage = 6;
@@ -42,10 +34,7 @@ function PropertyList() {
       let newData = data.map((item: IProperty) => ({
         ...item,
         type: item.type === "SALE" ? "Venda" : "Locação",
-        priceFormatted: (typeof item.price === "string"
-          ? parseFloat(item.price)
-          : item.price
-        ).toLocaleString("pt-BR", {
+        priceFormatted: (typeof item.price === "string" ? parseFloat(item.price) : item.price).toLocaleString("pt-BR", {
           style: "currency",
           currency: "BRL",
         }),
@@ -68,14 +57,18 @@ function PropertyList() {
       property.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    if (filterType) {
+      filtered = filtered.filter((property) => property.type.toLowerCase() === filterType);
+    }
+
     if (sortOption === "price_asc") {
-      filtered.sort((a: any, b: any) => a.price - b.price);
+      filtered.sort((a, b) => a.price - b.price);
     } else if (sortOption === "price_desc") {
-      filtered.sort((a: any, b: any) => b.price - a.price);
+      filtered.sort((a, b) => b.price - a.price);
     }
 
     return filtered;
-  }, [properties, searchQuery, sortOption]);
+  }, [properties, searchQuery, sortOption, filterType]);
 
   const paginatedProperties = useMemo(() => {
     const indexOfLast = currentPage * propertiesPerPage;
@@ -83,9 +76,7 @@ function PropertyList() {
     return filteredAndSortedProperties.slice(indexOfFirst, indexOfLast);
   }, [filteredAndSortedProperties, currentPage]);
 
-  const totalPages = Math.ceil(
-    filteredAndSortedProperties.length / propertiesPerPage
-  );
+  const totalPages = Math.ceil(filteredAndSortedProperties.length / propertiesPerPage);
 
   return (
     <div className="p-6 bg-white min-h-screen">
@@ -101,23 +92,14 @@ function PropertyList() {
               <ChevronRight className="h-4 w-4" />
             </BreadcrumbItem>
             <BreadcrumbItem>
-              <BreadcrumbLink href="#" className="font-semibold">
-                Listagem
-              </BreadcrumbLink>
+              <BreadcrumbLink href="#" className="font-semibold">Listagem</BreadcrumbLink>
             </BreadcrumbItem>
           </Breadcrumb>
 
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-4">
-            <h1 className="text-xl md:text-2xl font-bold">
-              Todas as propriedades disponíveis
-            </h1>
+            <h1 className="text-xl md:text-2xl font-bold">Todas as propriedades disponíveis</h1>
             <div className="flex flex-col md:flex-row mt-2 md:mt-0 gap-4">
-              <Input
-                placeholder="Buscar propriedade..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-64 bg-slate-100"
-              />
+              <Input placeholder="Buscar propriedade..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-64 bg-slate-100" />
               <Select onValueChange={setSortOption}>
                 <SelectTrigger className="bg-slate-100 w-[256px]">
                   <SelectValue placeholder="Ordenar por" />
@@ -128,6 +110,15 @@ function PropertyList() {
                   <SelectItem value="price_desc">Maior preço</SelectItem>
                 </SelectContent>
               </Select>
+              <Button variant={filterType === "venda" ? "default" : "outline"} onClick={() => setFilterType("venda")}>
+                Ver somente venda
+              </Button>
+              <Button variant={filterType === "locação" ? "default" : "outline"} onClick={() => setFilterType("locação")}>
+                Ver somente locação
+              </Button>
+              {filterType && (
+                <Button variant="destructive" onClick={() => setFilterType("")}>Limpar filtro</Button>
+              )}
             </div>
           </div>
 
@@ -145,8 +136,14 @@ function PropertyList() {
                   className="cursor-pointer transition-transform hover:scale-105 hover:shadow-lg"
                   onClick={() => navigate(`/property/${property.id}`)}
                 >
-                  <CardHeader>
+                  <CardHeader className="flex flex-row justify-between items-center">
                     <CardTitle>{property.title}</CardTitle>
+                    <Badge 
+                      variant="outline" 
+                      className={(property.type).toLowerCase() === 'venda' ? "border-green-700 text-green-700 text-sm" : "border-blue-700 text-blue-700 text-sm"}
+                    >
+                      {(property.type).toUpperCase()}
+                    </Badge>
                   </CardHeader>
                   <CardContent>
                     {property.photos[0].url ? (
@@ -179,11 +176,7 @@ function PropertyList() {
             )}
           </div>
 
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </>
       )}
     </div>

@@ -13,14 +13,13 @@ const Header: React.FC = () => {
         className="text-lg font-bold flex items-center gap-2 cursor-pointer"
         onClick={() => navigate('/')}
       >
-        <img className="h-6" src={logo} alt="Logo" />
         <span className="text-[#0C3551]">Edifício Internacional</span>
       </div>
 
 
       <nav className="hidden md:flex gap-6">
-        <Button variant="ghost" onClick={() => navigate('/properties')}>Propriedades</Button>
-        <Button variant="ghost" onClick={() => navigate('/login')}>Entrar</Button>
+      <Button variant="ghost" className="text-base hover:text-[#286893]" onClick={() => navigate('/properties')}>Propriedades</Button>
+      <Button variant="ghost" className="text-base hover:text-[#286893]" onClick={() => navigate('/login')}>Entrar</Button>
       </nav>
 
       {/* Menu Mobile */}
@@ -32,8 +31,8 @@ const Header: React.FC = () => {
         </SheetTrigger>
         <SheetContent side="left" className="w-64">
           <nav className="flex flex-col gap-4 mt-6">
-            <Button variant="ghost" onClick={() => navigate('/properties')}>Propriedades</Button>
-            <Button variant="ghost" onClick={() => navigate('/login')}>Entrar</Button>
+            <Button variant="ghost" className="text-sm hover:text-[#286893]" onClick={() => navigate('/properties')}>Propriedades</Button>
+            <Button variant="ghost" className="text-sm hover:text-[#286893]" onClick={() => navigate('/login')}>Entrar</Button>
           </nav>
         </SheetContent>
       </Sheet>

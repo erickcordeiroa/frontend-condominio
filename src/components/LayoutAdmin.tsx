@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -27,7 +27,7 @@ export default function LayoutAdmin() {
     { label: "Listar", href: "/admin/properties" },
   ]);
 
-  const user = userData() || { name: "Usuário" };
+  const user = userData();
 
   const getUserInitials = (name: string) => {
     const names = name.split(" ");
@@ -58,53 +58,59 @@ export default function LayoutAdmin() {
   };
 
   return (
-    <SidebarProvider>
-      <AppSidebar menu={data} />
-      <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center justify-between border-b px-4">
-          <div className="flex items-center gap-2">
-            <SidebarTrigger />
-            <Separator orientation="vertical" className="mr-2 h-4" />
-            <BreadcrumbProvider items={breadcrumbItems} />
-          </div>
+    <>
+      {user ? (
+        <SidebarProvider>
+          <AppSidebar menu={data} />
+          <SidebarInset>
+            <header className="flex h-16 shrink-0 items-center justify-between border-b px-4">
+              <div className="flex items-center gap-2">
+                <SidebarTrigger />
+                <Separator orientation="vertical" className="mr-2 h-4" />
+                <BreadcrumbProvider items={breadcrumbItems} />
+              </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 transition-colors"
-              >
-                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white font-bold">
-                  {getUserInitials(user.name)}
-                </div>
-                <span className="font-medium">{user.name}</span>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white font-bold">
+                      {getUserInitials(user.name)}
+                    </div>
+                    <span className="font-medium">{user.name}</span>
 
-                <ChevronDownIcon className="w-4 h-4 text-gray-500" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="w-48 border border-gray-200 rounded-lg shadow-sm"
-            >
-              <DropdownMenuItem
-                onClick={handleLogout}
-                className="cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-              >
-                Sair
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </header>
+                    <ChevronDownIcon className="w-4 h-4 text-gray-500" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-48 border border-gray-200 rounded-lg shadow-sm"
+                >
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="cursor-pointer px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                  >
+                    Sair
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </header>
 
-        <div className="flex flex-1 flex-col gap-4 p-4">
-          <Outlet context={{ setBreadcrumbItems }} />
-        </div>
+            <div className="flex flex-1 flex-col gap-4 p-4">
+              <Outlet context={{ setBreadcrumbItems }} />
+            </div>
 
-        <footer className="px-6 py-4 text-center text-sm">
-          © {new Date().getFullYear()} Edifício Internacional. Todos os direitos
-          reservados.
-        </footer>
-      </SidebarInset>
-    </SidebarProvider>
+            <footer className="px-6 py-4 text-center text-sm">
+              © {new Date().getFullYear()} Edifício Internacional. Todos os
+              direitos reservados.
+            </footer>
+          </SidebarInset>
+        </SidebarProvider>
+      ) : (
+        <Navigate to="/login" replace />
+      )}
+    </>
   );
 }
