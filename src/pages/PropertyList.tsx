@@ -146,7 +146,7 @@ function PropertyList() {
                     </Badge>
                   </CardHeader>
                   <CardContent>
-                    {property.photos[0].url ? (
+                    {property.photos.length > 0 ? (
                       <img
                         src={
                           property.photos[0].url
