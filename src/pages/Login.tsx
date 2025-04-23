@@ -2,7 +2,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import logo from "@/assets/images/LogoEdificioInternacional.png";
+import logo from "@/assets/images/new-logo.png";
 import {
   Card,
   CardContent,
@@ -50,12 +50,9 @@ const Login: React.FC = () => {
       {loading ?? <Spinner></Spinner>}
       <Card className="w-full max-w-sm sm:max-w-md md:max-w-lg bg-white shadow-xl rounded-lg p-6">
         <CardHeader className="flex flex-col items-center gap-3">
-          <a href="/" className="flex items-center gap-2 mb-3">
-            <img className="h-8" src={logo} alt="Logo" />
-            <span className="text-[#0C3551] font-semibold text-lg md:text-xl">
-              Edifício Internacional
-            </span>
-          </a>
+          <div className="flex items-center gap-2 mb-3">
+            <img className="h-16" src={logo} alt="Logo" />
+          </div>
           <CardDescription className="text-center text-sm md:text-base text-gray-600">
             Informe seu e-mail e senha para continuar
           </CardDescription>

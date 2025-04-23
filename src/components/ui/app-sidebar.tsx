@@ -1,5 +1,5 @@
 import * as React from "react";
-import { SquareChartGantt } from "lucide-react";
+import logo from "@/assets/images/new-logo.png";
 import {
   Sidebar,
   SidebarContent,
@@ -29,18 +29,13 @@ interface SidebarMenuProps extends React.ComponentProps<typeof Sidebar> {
 export const AppSidebar: React.FC<SidebarMenuProps> = ({ menu, ...props }) => {
   return (
     <Sidebar variant="floating" {...props}>
-      <SidebarHeader>
+      <SidebarHeader className="flex items-center">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="#">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <SquareChartGantt className="size-4" />
-                </div>
-                <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-semibold">Edifício Internacional</span>
-                </div>
-              </a>
+              <div>
+                <img className="h-8" src={logo} alt="Logo" />
+              </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

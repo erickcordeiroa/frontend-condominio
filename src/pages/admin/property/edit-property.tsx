@@ -25,8 +25,10 @@ import DeleteConfirmationModal from "@/components/Modal";
 const propertySchema = z.object({
   title: z.string().min(1, "O título é obrigatório"),
   description: z.string().min(1, "A descrição é obrigatória"),
-  location: z.string().min(1, "A localização é obrigatória"),
+  location: z.string().min(1, "O número do imóvel é obrigatório."),
+  responsiblePerson: z.string().min(1, "O nome do responsável é obrigatório"),
   contact: z.string().min(1, "O contato é obrigatório"),
+  whatsappContact: z.string().optional(),
   type: z.string().min(1, "O tipo é obrigatório"),
   price: z.string().min(1, "O preço é obrigatório"),
   images: z.array(z.any()),
@@ -63,6 +65,8 @@ export default function EditProperty() {
       description: "",
       location: "",
       contact: "",
+      responsiblePerson: "",
+      whatsappContact: "",
       type: "",
       price: "",
       images: [],
@@ -121,6 +125,7 @@ export default function EditProperty() {
           images: data.photos || [],
           price: formatCurrency(data.price.toString()),
           contact: formatPhone(data.contact),
+          whatsappContact: data.whatsappContact ? formatPhone(data.whatsappContact) : null,
         };
         setDefaultImages(data.photos || []);
 
@@ -145,6 +150,8 @@ export default function EditProperty() {
         description: data.description,
         location: data.location,
         contact: data.contact,
+        whatsappContact: data.whatsappContact,
+        responsiblePerson: data.responsiblePerson,
         type: data.type,
         price: priceFormatted,
       });
@@ -251,14 +258,14 @@ export default function EditProperty() {
               )}
             </div>
             <div>
-              <Label>Localização</Label>
+              <Label>Número do imóvel</Label>
               <Controller
                 name="location"
                 control={control}
                 render={({ field }) => (
                   <Input
                     {...field}
-                    placeholder="Localização do imóvel"
+                    placeholder="Número do imóvel"
                     required
                     className="mt-2"
                   />
@@ -267,6 +274,26 @@ export default function EditProperty() {
               {errors.location && (
                 <span className="text-red-500 text-xs mt-1">
                   {errors.location.message}
+                </span>
+              )}
+            </div>
+            <div>
+              <Label>Nome do responsável</Label>
+              <Controller
+                name="responsiblePerson"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    placeholder="Nome do responsável"
+                    required
+                    className="mt-2"
+                  />
+                )}
+              />
+              {errors.responsiblePerson && (
+                <span className="text-red-500 text-xs mt-1">
+                  {errors.responsiblePerson.message}
                 </span>
               )}
             </div>
@@ -293,6 +320,24 @@ export default function EditProperty() {
                   {errors.contact.message}
                 </span>
               )}
+            </div>
+            <div>
+              <Label>Contato WhatsApp</Label>
+              <Controller
+                name="whatsappContact"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    placeholder="Contato WhatsApp do proprietário"
+                    className="mt-2"
+                    value={formatPhone(contactValue)}
+                    onChange={(e) =>
+                      setValue("whatsappContact", formatPhone(e.target.value))
+                    }
+                  />
+                )}
+              />
             </div>
             <div>
               <Label>Tipo</Label>

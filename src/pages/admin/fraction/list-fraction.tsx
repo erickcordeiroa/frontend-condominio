@@ -134,7 +134,7 @@ export default function ListFraction() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Localização</TableHead>
+                <TableHead>Número do imóvel</TableHead>
                 <TableHead>Fração</TableHead>
                 <TableHead>Tipo</TableHead>
                 <TableHead className="text-center">Ações</TableHead>

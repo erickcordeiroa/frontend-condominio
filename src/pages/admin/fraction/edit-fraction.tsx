@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/select";
 
 const fractionSchema = z.object({
-  location: z.string().min(1, "A localização é obrigatória"),
+  location: z.string().min(1, "O número do imóvel é obrigatório."),
   type: z.string().min(1, "O tipo é obrigatório"),
   fraction: z.string().min(1, "A fração é obrigatória"),
 });
@@ -113,14 +113,14 @@ export default function EditFraction() {
       <h2 className="text-xl font-semibold mb-4">Editar Fração</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <Label>Localização</Label>
+          <Label>Número do imóvel</Label>
           <Controller
             name="location"
             control={control}
             render={({ field }) => (
               <Input
                 {...field}
-                placeholder="Localização do imóvel"
+                placeholder="Número do imóvel"
                 required
                 className="mt-2"
               />
