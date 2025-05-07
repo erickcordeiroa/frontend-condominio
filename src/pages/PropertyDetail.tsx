@@ -4,17 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, Autoplay } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Autoplay } from "swiper/modules";
+
 
 import { IProperty } from "@/types/Property";
 import { useApi } from "@/service/apiService";
 import useSpinner from "@/hooks/useLoadingStore";
 
-import { ArrowLeftIcon, MessageCircle } from "lucide-react";
+import { ArrowLeftIcon, CameraOffIcon, MessageCircle } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL_BACKEND as string;
 
@@ -50,14 +48,11 @@ export default function PropertyDetail() {
     }
   };
 
-
   useEffect(() => {
     getProperty();
   }, []);
 
-
   if (!property) return <p className="p-6">Propriedade não encontrada.</p>;
-
 
   return (
     <div className="p-6 max-w-6xl mx-auto bg-white min-h-screen">
@@ -74,28 +69,38 @@ export default function PropertyDetail() {
             Voltar
           </Button>
 
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <Swiper
-              modules={[Navigation, Pagination, Autoplay]}
-              spaceBetween={10}
-              slidesPerView={1}
-              navigation
-              pagination={{ clickable: true }}
-              autoplay={{ delay: 3000, disableOnInteraction: false }}
-              loop
-              style={{ width: '100%', height: 'auto' }}
-            >
-              {property.photos.map((image, index) => (
-                <SwiperSlide key={index}>
-                  <img
-                    src={API_URL + image.url}
-                    alt={`Imagem ${index + 1} da propriedade`}
-                    style={{ width: '100%', height: 'auto', objectFit: 'contain', borderRadius: '5px' }}
-                  />
-                </SwiperSlide>
-              ))}
-            </Swiper>
+            {property.photos.length > 0 ? (
+              <Swiper
+                modules={[Navigation, Pagination, Autoplay]}
+                spaceBetween={10}
+                slidesPerView={1}
+                navigation
+                pagination={{ clickable: true }}
+                autoplay={{ delay: 3000, disableOnInteraction: false }}
+                loop
+                style={{ width: "100%", height: "auto" }}
+              >
+                {property.photos.map((image, index) => (
+                  <SwiperSlide key={index}>
+                    <img
+                      src={API_URL + image.url}
+                      alt={`Imagem ${index + 1} da propriedade`}
+                      style={{
+                        width: "100%",
+                        height: "auto",
+                        objectFit: "contain",
+                        borderRadius: "5px",
+                      }}
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            ) : (
+              <div className="w-full h-120 rounded bg-slate-200 flex items-center justify-center">
+                <CameraOffIcon width={50} height={40} />
+              </div>
+            )}
 
             <div className="flex flex-col justify-between">
               <CardHeader className="gap-2 md:gap-4">
@@ -137,20 +142,14 @@ export default function PropertyDetail() {
                 </div>
 
                 {property.whatsappContact && (
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    asChild
-                  >
+                  <Button variant="outline" className="w-full" asChild>
                     <a
                       href={`https://wa.me/${property.whatsappContact}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-2"
                     >
-                      <MessageCircle
-                        className="w-5 h-5 text-green-600 group-hover:scale-110 transition-transform"
-                      />
+                      <MessageCircle className="w-5 h-5 text-green-600 group-hover:scale-110 transition-transform" />
                       <span className="text-green-700 font-medium text-sm md:text-lg">
                         Solicitar informações por WhatsApp
                       </span>
