@@ -11,6 +11,8 @@ export interface IProperty {
   description: string;
   location: string;
   contact: string;
+  responsiblePerson: string;
+  whatsappContact?: string;
   type: string;
   price: string;
   createdAt: string; 

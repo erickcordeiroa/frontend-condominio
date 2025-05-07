@@ -25,7 +25,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/properties" element={<PropertyList />} />
+        <Route path="/properties/:type" element={<PropertyList />} />
         <Route path="/property/:id" element={<PropertyDetail />} />
       </Route>
 

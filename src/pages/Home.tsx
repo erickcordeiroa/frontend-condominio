@@ -10,11 +10,8 @@ import { useNavigate } from "react-router-dom";
 import { useApi } from "@/service/apiService";
 import useSpinner from "@/hooks/useLoadingStore";
 import { IFraction } from "@/types/Fraction";
-import imgEdif1 from "@/assets/images/ed_inter01.jpg";
-import imgEdif2 from "@/assets/images/ed_inter02.jpg";
-import imgEdif3 from "@/assets/images/ed_inter03.jpg";
-import logoFachada from "@/assets/images/logo-fachada.svg";
-import ImgBackground from "@/assets/images/background-form.png";
+import ImgBackground from "@/assets/images/background-calculator.png";
+import painelVisual from "@/assets/images/painel-visual.png";
 
 export default function Home() {
   const api = useApi();
@@ -28,12 +25,12 @@ export default function Home() {
     type: z.enum(["LOJA", "APTO"]),
     location: z
       .string()
-      .min(1, "A localização é obrigatória")
+      .min(1, "O número do imóvel é obrigatório.")
       .refine(
         (val) => fraction.some((f) => f.location === val.padStart(2, "0")),
         "Digite o número de um imóvel válido!"
       ),
-    rateio: z.string().min(1, "Informe um valor válido"),
+    rateio: z.string().min(1, "Informe um valor válido."),
   });
 
   type calcFormValues = z.infer<typeof schema>;
@@ -70,7 +67,14 @@ export default function Home() {
       setLoading(true);
       const { data } = await api.get("/fractions");
 
-      setFractions(data);
+      const formattedData = data.map((item: any) => ({
+        ...item,
+        fraction: parseFloat(item.fraction),
+      }));
+      setFractions(formattedData);
+
+      console.log(formattedData)
+
     } catch (error) {
       console.error("Erro ao listar propriedades:", error);
     } finally {
@@ -94,7 +98,7 @@ export default function Home() {
       return;
     }
 
-    const valueToPay = (rateioFormatted * findFraction.fraction).toFixed(2);
+    const valueToPay = (rateioFormatted * findFraction.fraction);
     setResult(formatCurrency(valueToPay.toString()));
   };
 
@@ -120,6 +124,7 @@ export default function Home() {
       (item: IFraction) =>
         item.location === formattedLocation && item.type === typeValue
     );
+
     setIsValidLocation(!!findFraction);
   }, [locationValue, typeValue, fraction]);
 
@@ -143,69 +148,39 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white gap-12">
-
       <section className="w-full flex flex-col items-center">
-        <div
-          className="grid grid-cols-3 grid-rows-3 gap-6 lg:gap-12 w-full max-w-7xl h-[75vh] mt-6 mb-6"
-          style={{ gridTemplateAreas: '"a a d" "b b d" "b b c"' }}
-        >
+        <div className="w-full mt-12 mb-14 px-4">
           <img
-            src={logoFachada}
+            src={painelVisual}
             alt="Imagem logo"
-            className="w-full h-full object-contain opacity-0 transition-opacity duration-3000 delay-200"
-            style={{ gridArea: "a" }}
-            onLoad={(e) =>
-              (e.target as HTMLImageElement).classList.remove("opacity-0")
-            }
-          />
-
-          <img
-            src={imgEdif3}
-            alt="Imagem 1"
-            className="w-full h-full object-cover opacity-0 transition-opacity duration-1000 delay-100"
-            style={{ gridArea: "d" }}
-            onLoad={(e) =>
-              (e.target as HTMLImageElement).classList.remove("opacity-0")
-            }
-          />
-
-          <img
-            src={imgEdif1}
-            alt="Imagem 2"
-            className="w-full h-full object-cover opacity-0 transition-opacity duration-1000 delay-300"
-            style={{ gridArea: "b" }}
-            onLoad={(e) =>
-              (e.target as HTMLImageElement).classList.remove("opacity-0")
-            }
-          />
-
-          <img
-            src={imgEdif2}
-            alt="Imagem 3"
-            className="w-full h-full object-cover opacity-0 transition-opacity duration-1000 delay-500"
-            style={{ gridArea: "c" }}
+            className="w-full object-contain shadow-[0_0_50px_rgba(0,0,0,0.1)] rounded-md"
             onLoad={(e) =>
               (e.target as HTMLImageElement).classList.remove("opacity-0")
             }
           />
         </div>
 
-        <div className="flex gap-6 lg:gap-12 mt-10">
+        <div className="flex flex-col sm:flex-row justity-center gap-4 sm:gap-6 lg:gap-12 mt-10 px-4 max-w-4xl">
           <Button
-            className="text-base md:text-lg hover:border-gray-500 md:px-4 md:py-6"
+            className="w-full sm:w-auto text-sm sm:text-base md:text-2xl bg-[#1111cf] text-white hover:bg-[#115dcf] px-4 py-3 md:px-4 md:py-6"
             type="button"
-            variant={"outline"}
-            onClick={() => navigate("/properties")}
+            onClick={() => navigate("/properties/rent")}
           >
-            Veja nossos imóveis
+            ALUGUE
+          </Button>
+          <Button
+            className="w-full sm:w-auto text-sm sm:text-base md:text-2xl bg-[#37a23a] text-white hover:bg-[#49c245] px-4 py-3 md:px-4 md:py-6"
+            type="button"
+            onClick={() => navigate("/properties/sale")}
+          >
+            COMPRE
           </Button>
           <Button
             onClick={scrollToForm}
-            className="text-base md:text-lg md:px-4 md:py-6"
+            className="w-full sm:w-auto text-sm sm:text-base md:text-2xl px-4 py-3 md:px-4 md:py-6 bg-[#12368f] text-white hover:bg-[#0047cc]"
             type="button"
-            variant={"default"}
           >
-            Simule os Valores
+            SIMULE SEU CONDOMINIO
           </Button>
         </div>
       </section>
@@ -216,16 +191,30 @@ export default function Home() {
         style={{ backgroundImage: `url(${ImgBackground})` }}
       >
         <div className="absolute inset-0 bg-white opacity-70"></div>
-        <div className="relative bg-white p-6 lg:p-12 rounded-lg shadow-lg w-full max-w-2xl">
-          <h2 className="text-center text-lg md:text-xl lg:text-3xl font-bold text-[#09273c] mt-2 md:mt-4 mb-6 md:mb-10">
-            Simule o valor do rateio do condomínio
+
+        <div className="relative bg-white p-4 sm:p-6 md:p-8 lg:p-12 rounded-lg shadow-lg w-full max-w-2xl mx-4">
+          <h2 className="text-center text-lg sm:text-xl lg:text-3xl font-bold text-[#09273c] mb-4 sm:mb-6 md:mb-10">
+            Descubra o Valor do Seu Condomínio de Forma Simples e Rápida!
           </h2>
+
+          <p className="text-sm sm:text-base md:text-lg text-gray-800 mb-2 text-center">
+            Agora você pode calcular o valor exato de cada item do seu
+            condomínio!
+          </p>
+          <p className="text-sm sm:text-base md:text-lg text-gray-800 mb-2 text-center">
+            Basta inserir o valor desejado e o número da sua unidade para ver
+            automaticamente o custo de cada item do seu condomínio.
+          </p>
+          <p className="text-sm sm:text-base md:text-lg text-gray-800 mb-8 text-center">
+            Transparência e controle na ponta dos seus dedos.
+          </p>
+
           <form
             onSubmit={handleSubmit(handleCalculate)}
-            className="space-y-8 md:space-y-10"
+            className="space-y-6 sm:space-y-8 md:space-y-10"
           >
             <div>
-              <Label className="text-base md:text-lg lg:text-xl font-medium text-gray-700">
+              <Label className="text-sm sm:text-base md:text-2xl font-medium text-gray-700">
                 Selecione o tipo do imóvel:
               </Label>
               <Controller
@@ -233,25 +222,28 @@ export default function Home() {
                 control={control}
                 render={({ field }) => (
                   <RadioGroup
-                    onValueChange={field.onChange}
+                  onValueChange={(value) => {
+                    field.onChange(value);
+                    setValue("location", "");
+                  }}
                     defaultValue={field.value}
                     className="mt-3"
                   >
-                    <div className="flex items-center space-x-6">
-                      <div className="flex items-center justify-center space-x-3">
+                    <div className="flex flex-col sm:flex-row sm:space-x-6 gap-3 sm:gap-0">
+                      <div className="flex items-center space-x-3">
                         <RadioGroupItem value="LOJA" id="LOJA" />
                         <Label
                           htmlFor="LOJA"
-                          className="text-base mb-0 md:text-lg"
+                          className="text-sm sm:text-base md:text-xl mb-0"
                         >
                           Loja
                         </Label>
                       </div>
-                      <div className="flex items-center justify-center space-x-3">
+                      <div className="flex items-center space-x-3">
                         <RadioGroupItem value="APTO" id="APTO" />
                         <Label
                           htmlFor="APTO"
-                          className="text-base md:text-lg mb-0 "
+                          className="text-sm sm:text-base md:text-xl mb-0"
                         >
                           Apartamento
                         </Label>
@@ -265,7 +257,7 @@ export default function Home() {
             <div>
               <Label
                 htmlFor="location"
-                className="text-base md:text-lg lg:text-xl font-medium text-gray-700"
+                className="text-sm sm:text-base md:text-2xl font-medium text-gray-700"
               >
                 Digite o número do seu apartamento ou loja:
               </Label>
@@ -275,7 +267,7 @@ export default function Home() {
                 render={({ field }) => (
                   <Input
                     {...field}
-                    className="mt-2 p-6 text-xl lg:p-8 md:text-2xl"
+                    className="mt-2 px-4 py-6 text-base sm:text-lg md:text-xl"
                     placeholder="Exemplo: 08"
                     onChange={(e) => {
                       const value = e.target.value.replace(/\D/g, "");
@@ -299,7 +291,7 @@ export default function Home() {
             <div>
               <Label
                 htmlFor="rateio"
-                className="text-base md:text-lg lg:text-xl font-medium text-gray-700"
+                className="text-sm sm:text-base md:text-2xl font-medium text-gray-700"
               >
                 Digite o valor do rateio (R$):
               </Label>
@@ -310,7 +302,7 @@ export default function Home() {
                   <Input
                     {...field}
                     placeholder="Exemplo: 150,00"
-                    className="mt-2 p-6 text-xl lg:p-8 lg:text-2xl"
+                    className="mt-2 px-4 py-6 text-base sm:text-lg md:text-xl"
                     onChange={(e) =>
                       setValue("rateio", formatCurrency(e.target.value))
                     }
@@ -325,7 +317,7 @@ export default function Home() {
             </div>
 
             {result !== null && (
-              <div className="text-center mt-4 text-base md:text-xl text-gray-900">
+              <div className="text-center mt-4 text-base sm:text-lg md:text-2xl text-gray-900">
                 <p>Valor a pagar</p>
                 <p className="font-bold">R$ {result}</p>
               </div>
@@ -334,7 +326,7 @@ export default function Home() {
             <Button
               type="button"
               onClick={handleReset}
-              className="w-full text-base md:text-lg bg-gray-400 hover:bg-gray-500"
+              className="w-full py-6 text-base sm:text-lg md:text-2xl bg-gray-400 hover:bg-gray-500"
             >
               Limpar
             </Button>

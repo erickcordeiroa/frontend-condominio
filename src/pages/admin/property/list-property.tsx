@@ -136,7 +136,7 @@ export default function ListProperty() {
             <TableHeader>
               <TableRow>
                 <TableHead className="text-left">Título</TableHead>
-                <TableHead>Localização</TableHead>
+                <TableHead>Número do imóvel</TableHead>
                 <TableHead>Descrição</TableHead>
                 <TableHead>Preço</TableHead>
                 <TableHead>Tipo</TableHead>
