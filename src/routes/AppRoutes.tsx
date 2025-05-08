@@ -14,6 +14,7 @@ import PropertyDetail from "@/pages/PropertyDetail";
 import PropertyList from "@/pages/PropertyList";
 import Register from "@/pages/Register";
 import ResetPassword from "@/pages/ResetPassword";
+import Simulator from "@/pages/Simulator";
 import { Route, Routes } from "react-router-dom";
 
 const AppRoutes: React.FC = () => {
@@ -23,6 +24,7 @@ const AppRoutes: React.FC = () => {
         <Route index={true} path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/simulador" element={<Simulator />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/properties/:type" element={<PropertyList />} />
