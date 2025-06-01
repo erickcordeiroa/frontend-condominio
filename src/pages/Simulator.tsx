@@ -19,7 +19,7 @@ export default function Simulator() {
     const [isValidLocation, setIsValidLocation] = useState<boolean>(true);
 
     const schema = z.object({
-        type: z.enum(["LOJA", "APTO"]),
+        type: z.enum(["LOJA", "APTO", "BOX"]),
         location: z
             .string()
             .min(1, "O número do imóvel é obrigatório.")
