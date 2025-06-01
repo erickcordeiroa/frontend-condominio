@@ -44,7 +44,13 @@ export default function ListFraction() {
       if (data.length > 0) {
         newData = data.map((item: IFraction) => {
           const newItem = { ...item };
-          newItem.type = newItem.type === "LOJA" ? "Loja" : "Apartamento";
+          if (newItem.type === "LOJA") {
+            newItem.type = "Loja";
+          } else if (newItem.type === "APTO") {
+            newItem.type = "Apartamento";
+          } else if (newItem.type === "BOX") {
+            newItem.type = "Box";
+          }
 
           const fractionAsNumber =
             typeof newItem.fraction === "string"

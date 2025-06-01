@@ -204,6 +204,15 @@ export default function Simulator() {
                                                     Apartamento
                                                 </Label>
                                             </div>
+                                            <div className="flex items-center space-x-3">
+                                                <RadioGroupItem value="BOX" id="BOX" />
+                                                <Label
+                                                    htmlFor="BOX"
+                                                    className="text-sm sm:text-base md:text-xl mb-0"
+                                                >
+                                                    Box
+                                                </Label>
+                                            </div>
                                         </div>
                                     </RadioGroup>
                                 )}
@@ -215,7 +224,7 @@ export default function Simulator() {
                                 htmlFor="location"
                                 className="text-sm sm:text-base md:text-2xl font-medium text-gray-700"
                             >
-                                Digite o número do seu apartamento ou loja:
+                                Digite o número do seu apartamento, loja ou box:
                             </Label>
                             <Controller
                                 name="location"

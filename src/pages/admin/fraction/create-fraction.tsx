@@ -131,6 +131,7 @@ export default function CreateFraction() {
                 <SelectContent>
                   <SelectGroup>
                     <SelectItem value="APTO">Apartamento</SelectItem>
+                    <SelectItem value="BOX">Box</SelectItem>
                     <SelectItem value="LOJA">Loja</SelectItem>
                   </SelectGroup>
                 </SelectContent>
