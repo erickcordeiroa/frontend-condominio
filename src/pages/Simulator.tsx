@@ -95,7 +95,7 @@ export default function Simulator() {
             return;
         }
 
-        const valueToPay = (rateioFormatted * findFraction.fraction);
+        const valueToPay = (rateioFormatted * (findFraction.fraction / 100));
         setResult(formatCurrency(valueToPay.toString()));
     };
 
