@@ -70,8 +70,6 @@ export default function Simulator() {
             }));
             setFractions(formattedData);
 
-            console.log(formattedData)
-
         } catch (error) {
             console.error("Erro ao listar propriedades:", error);
         } finally {
@@ -95,7 +93,12 @@ export default function Simulator() {
             return;
         }
 
+        console.log(findFraction.fraction);
+        console.log(findFraction.fraction / 100);
+
         const valueToPay = (rateioFormatted * (findFraction.fraction / 100));
+
+        console.log(valueToPay);
         setResult(formatCurrency(valueToPay.toString()));
     };
 
