@@ -135,7 +135,7 @@ export default function Simulator() {
         );
 
         if (findFraction && rateioFormatted) {
-            const valueToPay = (rateioFormatted * findFraction.fraction).toFixed(2);
+            const valueToPay = (rateioFormatted * (findFraction.fraction / 100)).toFixed(2);
             setResult(formatCurrency(valueToPay.toString()));
         } else {
             setResult(null);
